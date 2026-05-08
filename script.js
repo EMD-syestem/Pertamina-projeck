@@ -2873,6 +2873,11 @@ function generateTanggalHeader() {
 // =========================
 async function loadMonitoringData(type = "jambi") {
   const tbody = document.getElementById("monitoringTableBody");
+  const mdvrHeader = document.getElementById("mdvrHeader");
+
+if (mdvrHeader) {
+  mdvrHeader.style.display = type === "rantau" ? "" : "none";
+}
 
   if (!tbody) {
     console.error("❌ monitoringTableBody tidak ditemukan");
@@ -3009,10 +3014,31 @@ async function loadMonitoringData(type = "jambi") {
           </td>
 
           <td>${getVal(d, ["Status RFID"])}</td>
-          <td>${getVal(d, ["Status Fuel Stock", "Status Fuel Stick"])}</td>
-          <td>${getVal(d, ["Remarks"])}</td>
-          <td>${getVal(d, ["Pengecekan Unit"])}</td>
-          <td>${getVal(d, ["Duration Eror/Hari"])}</td>
+
+          <td>
+              ${getVal(d, [
+              "Status Fuel Stock",
+              "Status Fuel Stick"
+              ])}
+          </td>
+
+         ${
+           type === "rantau"
+            ? `
+         <td class="${
+            getVal(d, ["Status MDVR"]) === "Active"
+            ? "active"
+            : "inactive"
+             }">
+           ${getVal(d, ["Status MDVR"])}
+       </td>
+           `
+           : ""
+          }
+
+        <td>${getVal(d, ["Remarks"])}</td>
+        <td>${getVal(d, ["Pengecekan Unit"])}</td>
+        <td>${getVal(d, ["Duration Eror/Hari"])}</td>
       `;
 
       for (let i = 1; i <= 31; i++) {
