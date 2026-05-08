@@ -2867,17 +2867,25 @@ function generateTanggalHeader() {
     header.appendChild(th);
   }
 }
+function refreshMonitoring() {
+  console.log("🔄 Refresh:", activeMonitoringType);
+  loadMonitoringData(activeMonitoringType);
+}
 
 // =========================
 // 🔥 LOAD MULTI LOCATION
 // =========================
-async function loadMonitoringData(type = "jambi") {
+async function loadMonitoringData(type = activeMonitoringType) {
+  // simpan lokasi aktif
+  activeMonitoringType = type;
+
   const tbody = document.getElementById("monitoringTableBody");
   const mdvrHeader = document.getElementById("mdvrHeader");
 
-if (mdvrHeader) {
-  mdvrHeader.style.display = type === "rantau" ? "" : "none";
-}
+  // tampilkan MDVR hanya untuk Rantau
+  if (mdvrHeader) {
+    mdvrHeader.style.display = type === "rantau" ? "" : "none";
+  }
 
   if (!tbody) {
     console.error("❌ monitoringTableBody tidak ditemukan");
@@ -2890,6 +2898,7 @@ if (mdvrHeader) {
     const API_URL = API_MAP[type];
 
     console.log("TYPE =", type);
+    console.log("ACTIVE TYPE =", activeMonitoringType);
     console.log("API URL =", API_URL);
 
     if (!API_URL) {
@@ -2926,7 +2935,6 @@ if (mdvrHeader) {
     }
 
     console.log("DATA API =", json);
-
     // =========================
     // 🔥 HEADER
     // =========================
