@@ -3686,6 +3686,7 @@ function refreshSummary() {
 const rowsPerPage = 100;
 let currentPage = 1;
 let allReportData = [];
+let filteredData = [];
 
 // ===================== LOAD DATA LAPORAN =====================
 async function loadReport() {
@@ -3733,7 +3734,9 @@ function renderReportTable() {
 
   const start = (currentPage - 1) * rowsPerPage;
   const end = start + rowsPerPage;
-  const pageData = allReportData.slice(start, end);
+  const dataSource =
+  filteredData.length ? filteredData : allReportData;
+  const pageData = dataSource.slice(start, end);
 
   pageData.forEach((item, i) => {
     const row = document.createElement("tr");
@@ -3894,7 +3897,14 @@ async function deleteItem(jobNumber) {
 }
 // ===================== PAGINATION DENGAN ANGKA =====================
 function renderPaginationNumbers() {
-  const totalPages = Math.ceil(allReportData.length / rowsPerPage);
+
+  // 🔥 TAMBAHAN
+  const dataSource =
+    filteredData.length ? filteredData : allReportData;
+
+  // 🔥 GANTI totalPages
+  const totalPages = Math.ceil(dataSource.length / rowsPerPage);
+
   let paginationContainer = document.getElementById("pagination");
 
   if (!paginationContainer) {
@@ -3903,49 +3913,87 @@ function renderPaginationNumbers() {
     paginationContainer.style.textAlign = "center";
     paginationContainer.style.margin = "15px 0";
     paginationContainer.style.userSelect = "none";
-    document.querySelector(".table-responsive").after(paginationContainer);
+
+    document
+      .querySelector(".table-responsive")
+      .after(paginationContainer);
   }
 
-  let buttonsHTML = `<span class="page-btn" onclick="changePage(-1)" ${
-    currentPage === 1 ? "style='opacity:0.5;pointer-events:none;'" : ""
-  }>⬅</span>`;
+  let buttonsHTML = `
+    <span class="page-btn"
+      onclick="changePage(-1)"
+      ${
+        currentPage === 1
+          ? "style='opacity:0.5;pointer-events:none;'"
+          : ""
+      }>
+      ⬅
+    </span>
+  `;
 
   for (let i = 1; i <= totalPages; i++) {
     buttonsHTML += `
       <span class="page-number ${
         i === currentPage ? "active" : ""
-      }" onclick="goToPage(${i})">${i}</span>
+      }"
+      onclick="goToPage(${i})">
+        ${i}
+      </span>
     `;
   }
 
-  buttonsHTML += `<span class="page-btn" onclick="changePage(1)" ${
-    currentPage === totalPages ? "style='opacity:0.5;pointer-events:none;'" : ""
-  }>➡</span>`;
+  buttonsHTML += `
+    <span class="page-btn"
+      onclick="changePage(1)"
+      ${
+        currentPage === totalPages
+          ? "style='opacity:0.5;pointer-events:none;'"
+          : ""
+      }>
+      ➡
+    </span>
+  `;
 
   paginationContainer.innerHTML = buttonsHTML;
 }
 
 function goToPage(page) {
   currentPage = page;
+
   renderReportTable();
+
   document
     .querySelector(".table-responsive")
-    .scrollIntoView({ behavior: "smooth" });
+    .scrollIntoView({
+      behavior: "smooth",
+    });
 }
 
 function changePage(direction) {
-  const totalPages = Math.ceil(allReportData.length / rowsPerPage);
+
+  // 🔥 TAMBAHAN
+  const dataSource =
+    filteredData.length ? filteredData : allReportData;
+
+  // 🔥 GANTI totalPages
+  const totalPages = Math.ceil(
+    dataSource.length / rowsPerPage
+  );
+
   const newPage = currentPage + direction;
 
   if (newPage >= 1 && newPage <= totalPages) {
     currentPage = newPage;
+
     renderReportTable();
+
     document
       .querySelector(".table-responsive")
-      .scrollIntoView({ behavior: "smooth" });
+      .scrollIntoView({
+        behavior: "smooth",
+      });
   }
 }
-
 // ===================== RENDER FOTO =====================
 function renderPhotoCell(photoField) {
   if (!photoField) return "❌ Tidak ada foto";
@@ -5236,25 +5284,31 @@ async function downloadExcel() {
 
 // ===================== PENCARIAN SPESIFIK BERDASARKAN JOB NUMBER =====================
 function filterTable() {
-  const searchJob = document.getElementById("searchJob").value.toLowerCase();
+  const searchJob = document
+    .getElementById("searchJob")
+    .value.toLowerCase();
+
   const searchVehicle = document
     .getElementById("searchVehicle")
     .value.toLowerCase();
-  const table = document.getElementById("reportTable");
-  const rows = table.getElementsByTagName("tr");
 
-  for (let i = 1; i < rows.length; i++) {
-    const jobCell = rows[i].getElementsByTagName("td")[1]; // Kolom No Pekerjaan
-    const vehicleCell = rows[i].getElementsByTagName("td")[9]; // Kolom Vehicle ID
+  filteredData = allReportData.filter((item) => {
+    const job = (item["Job Number"] || "")
+      .toLowerCase();
 
-    const matchJob =
-      jobCell && jobCell.textContent.toLowerCase().includes(searchJob);
-    const matchVehicle =
-      vehicleCell &&
-      vehicleCell.textContent.toLowerCase().includes(searchVehicle);
+    const vehicle = (
+      item["Vehicle id"] || ""
+    ).toLowerCase();
 
-    rows[i].style.display = matchJob && matchVehicle ? "" : "none";
-  }
+    return (
+      job.includes(searchJob) &&
+      vehicle.includes(searchVehicle)
+    );
+  });
+
+  currentPage = 1;
+
+  renderReportTable();
 }
 
 function clearSearchJob() {
