@@ -1762,7 +1762,7 @@ function loadCekRutinReport() {
   document.getElementById("reportCekRutinSection").style.display = "block";
 
   fetch(
-    "https://script.google.com/macros/s/AKfycbzdMdw6ZNMoj1IimADGcl2mVf0WHCgx9dBOys5BFPfMt4th8NmsuLlbO2DeZYV1aaPxRQ/exec"
+   "https://script.google.com/macros/s/AKfycbzdMdw6ZNMoj1IimADGcl2mVf0WHCgx9dBOys5BFPfMt4th8NmsuLlbO2DeZYV1aaPxRQ/exec?type=cek_rutin"
   )
     .then((res) => res.json())
     .then((data) => {
