@@ -1623,105 +1623,102 @@ input[type="checkbox"] {
   padding: 30px;
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  animation: fadeIn 0.5s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,.05);
   margin: 0 auto;
-  max-width: 96%; /* ✅ Biar lebar, tapi tetap ada margin kiri-kanan */
+  max-width: 96%;
 }
 
-/* === TABEL TANPA SCROLL === */
-#reportTable.full-width {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-  table-layout: fixed; /* ✅ Membuat kolom lebar merata dan responsif */
+/* WRAPPER */
+.table-wrapper{
+  width:100%;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 4px 15px rgba(0,0,0,.08);
+  border:1px solid #dbe7ff;
+  background:white;
 }
 
-/* HEADER TABEL */
-#reportTable thead th {
-  background-color: #0078ff;
-  color: white;
-  padding: 12px;
-  text-align: center;
-  font-weight: 600;
-  border: none;
+/* HEADER */
+.table-header{
+  overflow:hidden;
 }
 
-/* BODY TABEL */
-#reportTable tbody td {
-  padding: 10px 12px;
-  text-align: center;
-  border-bottom: 1px solid #e6e6e6;
-  word-wrap: break-word; /* ✅ Agar teks panjang tidak keluar */
+.table-header table{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
 }
 
-/* GANTI BACKGROUND BARIS GENAP */
-#reportTable tbody tr:nth-child(even) {
-  background-color: #f9faff;
+/* BODY */
+.table-body{
+  max-height:550px;   /* tinggi area scroll */
+  overflow-y:auto;
+  overflow-x:hidden;
 }
 
-/* HOVER EFEK */
-#reportTable tbody tr:hover {
-  background-color: #e6f2ff;
-  cursor: pointer;
+.table-body table{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
 }
 
-/* FOTO BUKTI */
-#reportTable tbody td img {
-  width: 60px;
-  height: 40px;
-  object-fit: cover;
-  border-radius: 5px;
-  border: 2px solid #ddd;
+/* Samakan style kolom */
+#reportHeader th,
+#reportTable td{
+  padding:14px 10px;
+  text-align:center;
+  vertical-align:middle;
+  word-break:break-word;
+  box-sizing:border-box;
 }
 
-/* TOMBOL */
-.btn {
-  padding: 8px 15px;
-  border-radius: 6px;
-  background: #0275d8;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-}
-.btn:hover {
-  opacity: 0.9;
+/* HEADER STYLE */
+#reportHeader th{
+  background:linear-gradient(135deg,#1d4ed8,#2563eb);
+  color:white;
+  font-weight:700;
+  border-right:1px solid rgba(255,255,255,.25);
+  position:sticky;
+  top:0;
+  z-index:5;
 }
 
-/* ANIMASI */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* BODY */
+#reportTable td{
+  border-bottom:1px solid #e5e7eb;
+  color:#1e3a8a;
+  background:#fff;
 }
 
-/* RESPONSIF (MOBILE) */
-@media (max-width: 768px) {
-  #reportTable thead {
-    display: none;
-  }
+#reportTable tr:nth-child(even) td{
+  background:#f8fbff;
+}
 
-  #reportTable tbody td {
-    display: block;
-    text-align: right;
-    padding-left: 50%;
-    position: relative;
-  }
+#reportTable tr:hover td{
+  background:#eef6ff;
+}
 
-  #reportTable tbody td::before {
-    content: attr(data-label);
-    position: absolute;
-    left: 10px;
-    font-weight: bold;
-    text-transform: uppercase;
-    color: #333;
-    white-space: nowrap;
-  }
+/* FOTO */
+#reportTable img{
+  width:65px;
+  height:50px;
+  object-fit:cover;
+  border-radius:8px;
+  border:2px solid #dbeafe;
+}
+
+/* SCROLLBAR */
+.table-body::-webkit-scrollbar{
+  width:10px;
+}
+
+.table-body::-webkit-scrollbar-track{
+  background:#edf4ff;
+}
+
+.table-body::-webkit-scrollbar-thumb{
+  background:#60a5fa;
+  border-radius:20px;
 }
 .report-section .btn {
   float: right; /* Memposisikan tombol ke sebelah kanan */
