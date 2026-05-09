@@ -1209,97 +1209,243 @@
     <span>Mengirim data ke server...</span>
   </div>
 
-  <!-- ====== PANEL LAPORAN (TERSEMBUNYI DI AWAL) ====== -->
-  <section id="reportSection" class="report-section">
+   <!-- ====== PANEL LAPORAN ====== -->
+<section id="reportSection" class="report-section">
 
-    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; flex-wrap:wrap; gap:10px;">
+  <!-- ================= TOP AREA ================= -->
+  <div style="
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:10px;
+    flex-wrap:wrap;
+    gap:10px;
+  ">
 
-      <!-- 🔍 INPUT PENCARIAN SPESIFIK -->
-      <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:15px;">
+    <!-- 🔍 FILTER -->
+    <div style="
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      margin-bottom:15px;
+    ">
 
-        <!-- 🔍 Pencarian No Pekerjaan -->
-        <div>
-          <label for="searchJob" style="font-size:14px; margin-bottom:3px; display:block;">
-            Cari berdasarkan <strong>No Pekerjaan</strong>:
-          </label>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <img src="https://i.postimg.cc/1RjD9YHJ/Chat-GPT-Image-19-Nov-2025-22-24-05.png" alt="Search Icon" style="width:55px; height:55px; object-fit:cover; border-radius:5px;">
-            <input type="text" id="searchJob" placeholder="Masukkan No Pekerjaan..." onkeyup="filterTable()" style="
-          padding:7px 10px;border:1px solid #ccc;border-radius:5px;width:200px;font-size:14px;">
-            <button onclick="clearSearchJob()" style="
-          background:#ff6666;color:white;border:none;padding:8px 12px;border-radius:5px;cursor:pointer;">
-              ❌ Clear
-            </button>
-          </div>
-        </div>
+      <!-- 🔍 SEARCH JOB -->
+      <div>
+        <label for="searchJob" style="
+          font-size:14px;
+          margin-bottom:3px;
+          display:block;
+        ">
+          Cari berdasarkan <strong>No Pekerjaan</strong>:
+        </label>
 
-        <!-- 🛻 Pencarian Vehicle ID -->
-        <div>
-          <label for="searchVehicle" style="font-size:14px; margin-bottom:3px; display:block;">
-            Cari berdasarkan <strong>Vehicle ID</strong>:
-          </label>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <img src="https://i.postimg.cc/1RjD9YHJ/Chat-GPT-Image-19-Nov-2025-22-24-05.png" alt="Search Icon" style="width:55px; height:55px; object-fit:cover; border-radius:5px;">
-            <input type="text" id="searchVehicle" placeholder="Masukkan Vehicle ID..." onkeyup="filterTable()" style="
-          padding:7px 10px;border:1px solid #ccc;border-radius:5px;width:200px;font-size:14px;">
-            <button onclick="clearSearchVehicle()" style="
-          background:#ff6666;color:white;border:none;padding:8px 12px;border-radius:5px;cursor:pointer;">
-              ❌ Clear
-            </button>
-          </div>
+        <div style="
+          display:flex;
+          align-items:center;
+          gap:8px;
+        ">
+
+          <img
+            src="https://i.postimg.cc/1RjD9YHJ/Chat-GPT-Image-19-Nov-2025-22-24-05.png"
+            alt="Search Icon"
+            style="
+              width:55px;
+              height:55px;
+              object-fit:cover;
+              border-radius:5px;
+            "
+          >
+
+          <input
+            type="text"
+            id="searchJob"
+            placeholder="Masukkan No Pekerjaan..."
+            onkeyup="filterTable()"
+            style="
+              padding:7px 10px;
+              border:1px solid #ccc;
+              border-radius:5px;
+              width:200px;
+              font-size:14px;
+            "
+          >
+
+          <button
+            onclick="clearSearchJob()"
+            style="
+              background:#ff6666;
+              color:white;
+              border:none;
+              padding:8px 12px;
+              border-radius:5px;
+              cursor:pointer;
+            "
+          >
+            ❌ Clear
+          </button>
+
         </div>
       </div>
 
-      <!-- 🎯 TOMBOL AKSI DI SEBELAH KANAN -->
-      <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
+      <!-- 🔍 SEARCH VEHICLE -->
+      <div>
+        <label for="searchVehicle" style="
+          font-size:14px;
+          margin-bottom:3px;
+          display:block;
+        ">
+          Cari berdasarkan <strong>Vehicle ID</strong>:
+        </label>
 
-        <button class="btn" onclick="loadReport()" style="
-        background:#2563eb;color:white;border:none;padding:10px 15px;
-        border-radius:5px;cursor:pointer;width:180px;font-weight:500;
-        box-shadow:0 2px 5px rgba(0,0,0,0.1);">
-          🔄 Muat Ulang
-        </button>
+        <div style="
+          display:flex;
+          align-items:center;
+          gap:8px;
+        ">
 
-        <button onclick="downloadReportWithPhotos()" style="
-        background:#4caf50;color:white;border:none;padding:10px 15px;
-        border-radius:5px;cursor:pointer;width:180px;font-weight:500;
-        box-shadow:0 2px 5px rgba(0,0,0,0.1);">
-          📥 Download Excel + Foto
-        </button>
+          <img
+            src="https://i.postimg.cc/1RjD9YHJ/Chat-GPT-Image-19-Nov-2025-22-24-05.png"
+            alt="Search Icon"
+            style="
+              width:55px;
+              height:55px;
+              object-fit:cover;
+              border-radius:5px;
+            "
+          >
+
+          <input
+            type="text"
+            id="searchVehicle"
+            placeholder="Masukkan Vehicle ID..."
+            onkeyup="filterTable()"
+            style="
+              padding:7px 10px;
+              border:1px solid #ccc;
+              border-radius:5px;
+              width:200px;
+              font-size:14px;
+            "
+          >
+
+          <button
+            onclick="clearSearchVehicle()"
+            style="
+              background:#ff6666;
+              color:white;
+              border:none;
+              padding:8px 12px;
+              border-radius:5px;
+              cursor:pointer;
+            "
+          >
+            ❌ Clear
+          </button>
+
+        </div>
       </div>
 
     </div>
 
-    <!-- ✅ WRAPPER UNTUK SCROLL RESPONSIF -->
-    <div class="table-responsive">
-      <table id="reportTable">
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Job Number</th>
-            <th>Tanggal</th>
-            <th>User Name</th>
-            <th>Working Type</th>
-            <th>Installation Type</th>
-            <th>Merk Kendaraan</th>
-            <th>Vehicle Type</th>
-            <th>License Plate</th>
-            <th>Vehicle id</th>
-            <th>Department</th>
-            <th>GPS Serial No</th>
-            <th>GPS Unit ID</th>
-            <th>GSM</th>
-            <th>Progres Status</th>
-            <th>Deskripsi Pekerjaan</th>
-            <th>Foto Bukti</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-      <div id="pagination" style="text-align:center; margin-top:10px;"></div>
+    <!-- 🎯 BUTTON AREA -->
+    <div style="
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:10px;
+    ">
+
+      <button
+        class="btn"
+        onclick="loadReport()"
+        style="
+          background:#2563eb;
+          color:white;
+          border:none;
+          padding:10px 15px;
+          border-radius:5px;
+          cursor:pointer;
+          width:180px;
+          font-weight:500;
+          box-shadow:0 2px 5px rgba(0,0,0,0.1);
+        "
+      >
+        🔄 Muat Ulang
+      </button>
+
+      <button
+        onclick="downloadReportWithPhotos()"
+        style="
+          background:#4caf50;
+          color:white;
+          border:none;
+          padding:10px 15px;
+          border-radius:5px;
+          cursor:pointer;
+          width:180px;
+          font-weight:500;
+          box-shadow:0 2px 5px rgba(0,0,0,0.1);
+        "
+      >
+        📥 Download Excel + Foto
+      </button>
+
     </div>
-  </section>
+
+  </div>
+
+  <!-- ================= HEADER TABLE ================= -->
+  <div class="table-header">
+
+    <table id="reportHeader">
+
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Job Number</th>
+          <th>Tanggal</th>
+          <th>User Name</th>
+          <th>Working Type</th>
+          <th>Installation Type</th>
+          <th>Merk Kendaraan</th>
+          <th>Vehicle Type</th>
+          <th>License Plate</th>
+          <th>Vehicle id</th>
+          <th>Department</th>
+          <th>GPS Serial No</th>
+          <th>GPS Unit ID</th>
+          <th>GSM</th>
+          <th>Progres Status</th>
+          <th>Deskripsi Pekerjaan</th>
+          <th>Foto Bukti</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+    </table>
+
+  </div>
+
+  <!-- ================= BODY TABLE ================= -->
+  <div class="table-body">
+
+    <table id="reportTable">
+
+      <tbody></tbody>
+
+    </table>
+
+  </div>
+
+  <!-- ================= PAGINATION ================= -->
+  <div id="pagination" style="
+    text-align:center;
+    margin-top:10px;
+  "></div>
+
+</section>
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <!-- Library ExcelJS + FileSaver -->
