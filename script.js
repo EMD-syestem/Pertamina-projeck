@@ -1762,7 +1762,7 @@ function loadCekRutinReport() {
   document.getElementById("reportCekRutinSection").style.display = "block";
 
   fetch(
-   "https://script.google.com/macros/s/AKfycbzdMdw6ZNMoj1IimADGcl2mVf0WHCgx9dBOys5BFPfMt4th8NmsuLlbO2DeZYV1aaPxRQ/exec?type=cek_rutin"
+     "https://script.google.com/macros/s/AKfycbzdMdw6ZNMoj1IimADGcl2mVf0WHCgx9dBOys5BFPfMt4th8NmsuLlbO2DeZYV1aaPxRQ/exec?type=cek_rutin"
   )
     .then((res) => res.json())
     .then((data) => {
@@ -3072,6 +3072,13 @@ async function loadMonitoringData(type = activeMonitoringType) {
       "<tr><td colspan='50'>❌ Gagal load data (cek console)</td></tr>";
   }
 }
+
+const monitoringBody = document.querySelector(".monitoring-body");
+const monitoringHeader = document.querySelector(".monitoring-header");
+
+monitoringBody.addEventListener("scroll", function () {
+  monitoringHeader.scrollLeft = monitoringBody.scrollLeft;
+});
 // =========================
 // 🔥 AUTO DEFAULT JAMI
 // =========================
@@ -4687,7 +4694,7 @@ function openDetail(item = {}) {
     <p style="margin:3px 0; font-size:14px;">Alamat: Kantor Pusat PT Indosat (KPPTI) Lt. 18
 Jl. Medan Merdeka Barat No.21
 Daerah Khusus Ibukota Jakarta, 10110</p>
-    <p style="margin:3px 0; font-size:14px;">WhatsApp:ICT Service Indosat. +62 855-7556-677 | Teknisi VTS Jambi 0895-3822-81515 | Teknisi VTS Rantau 0852-7091-7992 | Teknisi VTS PSU 0813-9616-2656</p>
+    <p style="margin:3px 0; font-size:14px;">WhatsApp:ICT Service Indosat. +62 855-7556-677 | Teknisi VTS Jambi 0895-3822-81515</p>
   </div>
 </div>
 
