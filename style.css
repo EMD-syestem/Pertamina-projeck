@@ -3292,3 +3292,78 @@ grid-template-columns: repeat(4, 1fr);
 .btn-refresh:active{
   transform:scale(.97);
 }
+/* WRAPPER */
+.monitoring-wrapper{
+  width:100%;
+  overflow:hidden;
+  border-radius:12px;
+  border:1px solid #dbe4f0;
+  background:#fff;
+}
+
+/* HEADER */
+.monitoring-header{
+  overflow:hidden;
+  width:100%;
+  border-bottom:1px solid #dbe4f0;
+}
+
+/* BODY */
+.monitoring-body{
+  max-height:500px;
+  overflow:auto;
+  width:100%;
+}
+
+/* TABLE */
+.monitoring-table{
+  width:2200px;
+  border-collapse:collapse;
+  table-layout:fixed;
+}
+
+/* HEADER + BODY */
+.monitoring-table th,
+.monitoring-table td{
+  width:120px;
+  min-width:120px;
+  max-width:120px;
+  padding:12px 10px;
+  text-align:center;
+  vertical-align:middle;
+  word-break:break-word;
+  box-sizing:border-box;
+}
+
+/* kolom pertama */
+.monitoring-table th:first-child,
+.monitoring-table td:first-child{
+  width:60px;
+  min-width:60px;
+  max-width:60px;
+}
+
+/* HEADER */
+.monitoring-table th{
+  background:#2f56cc;
+  color:white;
+  font-weight:700;
+  position:sticky;
+  top:0;
+  z-index:5;
+}
+
+/* BODY */
+.monitoring-table td{
+  border-bottom:1px solid #dbe4f0;
+  border-right:1px solid #dbe4f0;
+  background:white;
+}
+
+.monitoring-table tbody tr:nth-child(even) td{
+  background:#f8fbff;
+}
+
+.monitoring-table tbody tr:hover td{
+  background:#edf5ff;
+}
