@@ -2065,32 +2065,43 @@
 
 
     <div class="table-container">
-      <table class="monitoring-table">
-        <thead>
-          <tr id="monitoringHeader">
-            <th>No</th>
-            <th>Node</th>
-            <th>License Plate</th>
-            <th>Jenis kendaraan</th>
-            <th>IMEI</th>
-            <th>IMSI</th>
-            <th>Status VTS</th>
-            <th>Status RFID</th>
-            <th>Status Fuel Stick</th>
-            <th id="mdvrHeader">Status MDVR</th>
-            <th>Remarks</th>
-            <th>Pengecekan Unit</th>
-            <th>Duration Eror/Hari</th>
-          </tr>
-        </thead>
-        <tbody id="monitoringTableBody">
-          <tr>
-            <td colspan="50">Klik tombol untuk load data</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+      <div class="monitoring-wrapper">
 
+  <!-- HEADER -->
+  <div class="monitoring-header">
+    <table class="monitoring-table">
+      <thead>
+        <tr id="monitoringHeader">
+          <th>No</th>
+          <th>Node</th>
+          <th>License Plate</th>
+          <th>Jenis kendaraan</th>
+          <th>IMEI</th>
+          <th>IMSI</th>
+          <th>Status VTS</th>
+          <th>Status RFID</th>
+          <th>Status Fuel Stick</th>
+          <th id="mdvrHeader">Status MDVR</th>
+          <th>Remarks</th>
+          <th>Pengecekan Unit</th>
+          <th>Duration Eror/Hari</th>
+        </tr>
+      </thead>
+    </table>
+  </div>
+
+  <!-- BODY -->
+  <div class="monitoring-body">
+    <table class="monitoring-table">
+      <tbody id="monitoringTableBody">
+        <tr>
+          <td colspan="50">Klik tombol untuk load data</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
   </section>
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
   <!-- ===== PROGRESS REPORT VTS ===== -->
