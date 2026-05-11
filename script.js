@@ -5335,3 +5335,71 @@ function clearSearchVehicle() {
   document.getElementById("searchVehicle").value = "";
   filterTable(); // Refresh filter setelah input dikosongkan
 }
+
+/* =========================
+   TOGGLE MENU SETTING
+========================= */
+function toggleSettingMenu(event) {
+    event.stopPropagation();
+
+    const menu = document.getElementById("settingMenu");
+
+    menu.classList.toggle("show");
+}
+
+/* =========================
+   TUTUP MENU SAAT KLIK LUAR
+========================= */
+document.addEventListener("click", function(e){
+
+    const menu = document.getElementById("settingMenu");
+    const wrapper = document.querySelector(".setting-wrapper");
+
+    if (!wrapper.contains(e.target)) {
+        menu.classList.remove("show");
+    }
+
+});
+
+/* upload wallpaper */
+document.addEventListener("DOMContentLoaded", ()=>{
+
+    const input = document.getElementById("wallpaperInput");
+
+    if(input){
+        input.addEventListener("change", function(e){
+
+            const file = e.target.files[0];
+            if(!file) return;
+
+            const reader = new FileReader();
+
+            reader.onload = function(ev){
+                const img = ev.target.result;
+
+                document.body.style.background =
+                    `url(${img}) center center / cover no-repeat fixed`;
+
+                localStorage.setItem("dashboardWallpaper", img);
+            };
+
+            reader.readAsDataURL(file);
+        });
+    }
+
+    /* load saved wallpaper */
+    const savedWallpaper = localStorage.getItem("dashboardWallpaper");
+
+    if(savedWallpaper){
+        document.body.style.background =
+            `url(${savedWallpaper}) center center / cover no-repeat fixed`;
+    }
+});
+
+/* reset */
+function resetWallpaper(){
+    localStorage.removeItem("dashboardWallpaper");
+    document.body.style.background = "#f4f6fb";
+
+    document.getElementById("settingMenu").classList.remove("show");
+}
