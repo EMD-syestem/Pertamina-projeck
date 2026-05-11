@@ -93,6 +93,28 @@
       </div>
     </div>
 
+    <!-- ⚙️ SETTING -->
+<div class="setting-wrapper">
+
+  <div class="setting-btn" onclick="toggleSettingMenu(event)">
+    ⚙️
+  </div>
+
+  <div id="settingMenu" class="setting-menu">
+    <h4>Pengaturan Dashboard</h4>
+
+    <label class="upload-wallpaper">
+      Ganti Wallpaper
+      <input type="file" id="wallpaperInput" accept="image/*" hidden>
+    </label>
+
+    <button onclick="resetWallpaper()" class="reset-wallpaper">
+      Reset Wallpaper
+    </button>
+  </div>
+
+</div>
+
     <!-- 🔔 LONCENG NOTIF -->
     <div class="notif-wrapper" style="position:absolute; top:10px; right:70px;">
 
