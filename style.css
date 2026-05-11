@@ -368,7 +368,7 @@ header {
   letter-spacing: 0.5px;
 }
 
-/* ====== LINK NAVIGASI ====== */
+/* ====== LINK NAVIGASI HEADER ====== */
 .header-links {
   margin-top: 10px;
   margin-left: auto;
@@ -378,35 +378,115 @@ header {
   justify-content: flex-end;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px; /* sedikit dirapatkan */
+  gap: 10px;
 
-  background: rgba(255, 255, 255, 0.1);
-  padding: 4px 6px; /* diperkecil */
-  border-radius: 8px;
-  backdrop-filter: blur(4px);
+  /* ✅ Glass modern */
+  background: rgba(255, 255, 255, 0.06);
 
-  transform: translateX(380px); /* tetap */
-}
+  padding: 7px 10px;
 
-.header-links a {
-  color: #fff;
-  text-decoration: none;
-  font-size: 11px; /* lebih kecil */
-  font-weight: 600;
-  padding: 4px 8px; /* lebih kecil */
-  border-radius: 5px;
+  border-radius: 14px;
 
-  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  /* ✅ Shadow premium */
+  box-shadow:
+    0 4px 18px rgba(0,0,0,0.14),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+
+  /* ✅ Geser lebih ke kanan */
+  transform: translateX(500px);
+
   transition: all 0.3s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
+/* ====== STYLE DASAR ====== */
+.header-links a {
+  position: relative;
+
+  color: #f8fafc;
+  text-decoration: none;
+
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+
+  padding: 6px 12px;
+
+  border-radius: 9px;
+
+  overflow: hidden;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    filter 0.25s ease;
+
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.18);
+
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* ====== WEB ARVENTO ====== */
+.header-links a:nth-child(1) {
+  background: linear-gradient(135deg, #0f766e, #14b8a6);
+}
+
+/* ====== WEB FORM BBM ====== */
+.header-links a:nth-child(2) {
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+}
+
+/* ====== CEK SIGNAL ====== */
+.header-links a:nth-child(3) {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+}
+
+/* ====== FUSE PAJERO ====== */
+.header-links a:nth-child(4) {
+  background: linear-gradient(135deg, #d97706, #f59e0b);
+}
+
+/* ====== FUSE TRITON ====== */
+.header-links a:nth-child(5) {
+  background: linear-gradient(135deg, #b91c1c, #ef4444);
+}
+
+/* ====== EFEK CAHAYA ====== */
+.header-links a::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      120deg,
+      rgba(255,255,255,0.18),
+      transparent 40%
+    );
+
+  opacity: 0.7;
+}
+
+/* ====== HOVER ====== */
 .header-links a:hover {
-  background: linear-gradient(135deg, #2563eb, #1e3a8a);
-  transform: translateY(-1px);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+  transform: translateY(-2px);
+
+  filter: brightness(1.06);
+
+  box-shadow:
+    0 6px 16px rgba(0,0,0,0.22);
 }
 
+/* ====== ACTIVE CLICK ====== */
+.header-links a:active {
+  transform: scale(0.97);
+}
 /* ====== Jam di kanan atas ====== */
 .header-date {
   position: fixed;
