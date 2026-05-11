@@ -1,6 +1,6 @@
 /// ===================== LOGIN SECTION (GOOGLE SHEET) =====================
 const SHEET_API =
-  "https://script.google.com/macros/s/AKfycbyi4bRXw8q-9ggnvPNr89HrhYTGfU4YdioAD5HTr0NwNbM0f8PktjQWecyQQt-9xl90Sg/exec";
+  "https://script.google.com/macros/s/AKfycbzbPR6TvGxY4oc13u--3pd0j1RbJu-b5587AiRYxb2jm-WidBGcsH0D9MUpBCKQ_Cqu6A/exec";
 
 let users = [];
 let onlineInterval = null;
@@ -467,6 +467,346 @@ function renderFeed(data) {
   onlineUsersBox.innerHTML = html;
 }
 
+/* =========================
+   API INVENTORY
+========================= */
+
+const INVENTORY_API =
+  "https://script.google.com/macros/s/AKfycbzbPR6TvGxY4oc13u--3pd0j1RbJu-b5587AiRYxb2jm-WidBGcsH0D9MUpBCKQ_Cqu6A/exec?type=inventory";
+
+/* =========================
+   DATA GLOBAL
+========================= */
+
+let inventoryData = null;
+
+/* =========================
+   LOAD DATA
+========================= */
+
+async function loadInventoryData() {
+
+  try {
+
+    const res = await fetch(INVENTORY_API);
+
+    inventoryData = await res.json();
+
+    console.log(
+      "✅ Inventory Loaded:",
+      inventoryData
+    );
+
+  } catch(err) {
+
+    console.error(
+      "❌ Gagal load inventory:",
+      err
+    );
+  }
+}
+
+/* =========================
+   LOAD AWAL
+========================= */
+
+loadInventoryData();
+
+/* =========================
+   TOGGLE MENU
+========================= */
+
+function toggleInventoryMenu() {
+
+  const menu =
+    document.getElementById(
+      "inventoryMenu"
+    );
+
+  menu.classList.toggle("show");
+}
+
+/* =========================
+   OPEN INVENTORY
+========================= */
+
+/* =========================
+   OPEN INVENTORY
+========================= */
+
+async function openInventory(
+  type,
+  subType = ""
+) {
+
+  /* =========================
+     LOAD DATA JIKA NULL
+  ========================= */
+
+  if (!inventoryData) {
+
+    try {
+
+      const res =
+        await fetch(INVENTORY_API);
+
+      inventoryData =
+        await res.json();
+
+    } catch(err) {
+
+      console.error(err);
+
+      alert(
+        "Gagal mengambil data inventory"
+      );
+
+      return;
+    }
+  }
+
+  /* =========================
+     CONTAINER
+  ========================= */
+
+  const container =
+    document.getElementById(
+      "inventoryFrameContainer"
+    );
+
+  let data = [];
+
+  /* =========================
+     DERI
+  ========================= */
+
+  if (type === "deri") {
+
+    data =
+      inventoryData.deri || [];
+  }
+
+  /* =========================
+     ANUGRAH INVENTORY
+  ========================= */
+
+  if (
+    type === "anugrah" &&
+    subType === "inventory"
+  ) {
+
+    data =
+      inventoryData.anugrah.inventory || [];
+  }
+
+  /* =========================
+     ANUGRAH SPAREPART
+  ========================= */
+
+  if (
+    type === "anugrah" &&
+    subType === "sparepart"
+  ) {
+
+    data =
+      inventoryData.anugrah.sparepart || [];
+  }
+
+  /* =========================
+     TITLE
+  ========================= */
+
+  let title =
+    "Inventory";
+
+  if (type === "deri") {
+
+    title =
+      "📦 Deri Inventory";
+  }
+
+  if (
+    type === "anugrah" &&
+    subType === "inventory"
+  ) {
+
+    title =
+      "📦 Anugrah Inventory";
+  }
+
+  if (
+    type === "anugrah" &&
+    subType === "sparepart"
+  ) {
+
+    title =
+      "🔧 Anugrah Sparepart";
+  }
+
+  /* =========================
+     GENERATE HTML
+  ========================= */
+
+  let html = `
+
+  <div class="inventory-popup">
+
+    <div class="inventory-popup-header">
+
+      <h2>${title}</h2>
+
+      <button
+        onclick="closeInventoryPopup()">
+
+        ✖
+
+      </button>
+
+    </div>
+
+    <div class="inventory-table-wrapper">
+
+      <table class="inventory-table">
+
+        <thead>
+
+          <tr>
+
+            <th>No</th>
+
+            <th>Barang</th>
+
+            <th>Jumlah</th>
+
+            <th>Merek</th>
+
+            ${
+              subType === "sparepart"
+              ? "<th>Status</th>"
+              : ""
+            }
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+  `;
+
+  /* =========================
+     DATA KOSONG
+  ========================= */
+
+  if (!data.length) {
+
+    html += `
+
+      <tr>
+
+        <td colspan="5"
+          style="
+            text-align:center;
+            padding:20px;
+            color:#666;
+          ">
+
+          Data inventory kosong
+
+        </td>
+
+      </tr>
+    `;
+  }
+
+  /* =========================
+     LOOP DATA
+  ========================= */
+
+  data.forEach(item => {
+
+    html += `
+
+      <tr>
+
+        <td>${item.no || ""}</td>
+
+        <td>${item.barang || ""}</td>
+
+        <td>${item.jumlah || ""}</td>
+
+        <td>${item.merek || ""}</td>
+
+        ${
+          subType === "sparepart"
+          ? `<td>${item.status || ""}</td>`
+          : ""
+        }
+
+      </tr>
+    `;
+  });
+
+  html += `
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+  `;
+
+  /* =========================
+     RENDER
+  ========================= */
+
+  container.innerHTML = html;
+
+  /* =========================
+     CLOSE MENU
+  ========================= */
+
+  document
+    .getElementById("inventoryMenu")
+    .classList.remove("show");
+}
+/* =========================
+   CLOSE POPUP
+========================= */
+
+function closeInventoryPopup() {
+
+  document.getElementById(
+    "inventoryFrameContainer"
+  ).innerHTML = "";
+}
+/* =========================
+   KLIK LUAR MENU
+========================= */
+
+document.addEventListener(
+  "click",
+  function(e) {
+
+    const dropdown =
+      document.querySelector(
+        ".inventory-dropdown"
+      );
+
+    if (
+      dropdown &&
+      !dropdown.contains(e.target)
+    ) {
+
+      document
+        .getElementById(
+          "inventoryMenu"
+        )
+        .classList.remove("show");
+    }
+  }
+);
 // ===================== SHOW LOGIN =====================
 function showLoginPage() {
   document.querySelector("header").style.display = "none";
@@ -516,44 +856,25 @@ async function login() {
 
 // ===================== TAMPILAN AWAL =====================
 window.addEventListener("DOMContentLoaded", async () => {
-
-  // sembunyikan semua dulu
-  document.getElementById("loginPage").style.display = "none";
-  document.querySelector("header").style.display = "none";
-  document.querySelector("main").style.display = "none";
+  showLoginPage();
 
   await loadUsers();
 
   const savedUser = localStorage.getItem("currentUser");
 
-  // kalau belum login
-  if (!savedUser) {
-    showLoginPage();
-    return;
-  }
+  if (!savedUser) return;
 
-  const user = users.find(
-    (u) => String(u.Email).trim() === savedUser
-  );
+  const user = users.find((u) => String(u.Email).trim() === savedUser);
 
-  // kalau user tidak ditemukan
   if (!user) {
     localStorage.removeItem("currentUser");
     localStorage.removeItem("currentJobPrefix");
-
-    showLoginPage();
     return;
   }
 
-  // auto login
-  await updateUserStatus(
-    savedUser,
-    "Online",
-    "Auto Login"
-  );
+  await updateUserStatus(savedUser, "Online", "Auto Login");
 
   await showDashboard(user);
-
 });
 
 // ===================== TAB DITUTUP =====================
