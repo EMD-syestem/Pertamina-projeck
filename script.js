@@ -516,25 +516,44 @@ async function login() {
 
 // ===================== TAMPILAN AWAL =====================
 window.addEventListener("DOMContentLoaded", async () => {
-  showLoginPage();
+
+  // sembunyikan semua dulu
+  document.getElementById("loginPage").style.display = "none";
+  document.querySelector("header").style.display = "none";
+  document.querySelector("main").style.display = "none";
 
   await loadUsers();
 
   const savedUser = localStorage.getItem("currentUser");
 
-  if (!savedUser) return;
-
-  const user = users.find((u) => String(u.Email).trim() === savedUser);
-
-  if (!user) {
-    localStorage.removeItem("currentUser");
-    localStorage.removeItem("currentJobPrefix");
+  // kalau belum login
+  if (!savedUser) {
+    showLoginPage();
     return;
   }
 
-  await updateUserStatus(savedUser, "Online", "Auto Login");
+  const user = users.find(
+    (u) => String(u.Email).trim() === savedUser
+  );
+
+  // kalau user tidak ditemukan
+  if (!user) {
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("currentJobPrefix");
+
+    showLoginPage();
+    return;
+  }
+
+  // auto login
+  await updateUserStatus(
+    savedUser,
+    "Online",
+    "Auto Login"
+  );
 
   await showDashboard(user);
+
 });
 
 // ===================== TAB DITUTUP =====================
