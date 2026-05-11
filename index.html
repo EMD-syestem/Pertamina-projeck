@@ -72,28 +72,147 @@
     <div class="spinner"></div>
   </div>
 
-  <header>
-    <div class="header-container">
-      <div class="header-text">
-        <h1>DASHBOARD MAINTENANCE EOS & REPORT DA VTS PERTAMINA JAMBI</h1>
+ <header>
+  <div class="header-container">
 
-        <div class="header-links">
-          <a href="javascript:void(0);" onclick="window.open('https://web.arvento.com/home.aspx', '_blank')">🌐 web Arvento </a>
-          <a href="javascript:void(0);" onclick="window.open('https://emd-syestem.github.io/Form-input--bbm/', '_blank')">🌐 web Form BBM</a>
-          <a href="javascript:void(0);" onclick="window.open('https://ioh.co.id/portal/id/bscoveragearea', '_blank')">📡 Cek Signal Area</a>
-          <a href="javascript:void(0);" onclick="window.open('https://www.startmycar.com/mitsubishi/montero/info/fusebox/2019/trims-sport', '_blank')">Fuse Mitsubishi Pajero</a>
-           <a href="javascript:void(0);" onclick="window.open('https://www.startmycar.com/mitsubishi/triton/info/fusebox/2023#anchorfusebox0', '_blank')">Fuse Mitsubishi triton 2023</a>
-        </div>
+    <div class="header-text">
+      <h1>
+        DASHBOARD MAINTENANCE EOS & REPORT DA VTS
+        PERTAMINA JAMBI.RANTAU.PANGSU
+      </h1>
 
-        <!-- Info User -->
-        <div class="user-info">
-          <img id="userPhoto" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="User Photo">
-          <span id="loggedInUser">Guest</span>
-        </div>
+      <!-- ================= HEADER LINKS ================= -->
+      <div class="header-links">
+        <a href="javascript:void(0);"
+          onclick="window.open('https://web.arvento.com/home.aspx', '_blank')">
+          🌐 web Arvento
+        </a>
+
+        <a href="javascript:void(0);"
+          onclick="window.open('https://emd-syestem.github.io/Form-input--bbm/', '_blank')">
+          🌐 web Form BBM
+        </a>
+
+        <a href="javascript:void(0);"
+          onclick="window.open('https://ioh.co.id/portal/id/bscoveragearea', '_blank')">
+          📡 Cek Signal Area
+        </a>
+
+        <a href="javascript:void(0);"
+          onclick="window.open('https://www.startmycar.com/mitsubishi/montero/info/fusebox/2019/trims-sport', '_blank')">
+          Fuse Mitsubishi Pajero
+        </a>
+
+        <a href="javascript:void(0);"
+          onclick="window.open('https://www.startmycar.com/mitsubishi/triton/info/fusebox/2023#anchorfusebox0', '_blank')">
+          Fuse Mitsubishi triton 2023
+        </a>
       </div>
+
+      <!-- ================= USER AREA ================= -->
+     <!-- ============================= -->
+<!-- ===== USER AREA ============= -->
+<!-- ============================= -->
+
+<div class="user-area">
+
+  <!-- ===== USER INFO ===== -->
+
+  <div class="user-info">
+
+    <img
+      id="userPhoto"
+      src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+      alt="User Photo">
+
+    <span id="loggedInUser">
+      Guest
+    </span>
+
+  </div>
+
+  <!-- ============================= -->
+  <!-- ===== INVENTORY DROPDOWN ==== -->
+  <!-- ============================= -->
+
+  <div class="inventory-dropdown">
+
+    <!-- ===== BUTTON ===== -->
+
+    <button
+      class="inventory-btn"
+      onclick="toggleInventoryMenu()">
+
+      📦 Inventory
+
+    </button>
+
+    <!-- ===== MENU ===== -->
+
+    <div
+      class="inventory-menu"
+      id="inventoryMenu">
+
+      <!-- ===== DERI ===== -->
+
+      <div
+        class="inventory-item"
+        onclick="openInventory('deri')">
+
+        👤 Deri Inventory
+
+      </div>
+
+      <!-- ===== ANUGRAH ===== -->
+
+      <div class="inventory-submenu">
+
+        <div class="inventory-item submenu-btn">
+
+          👤 Anugrah
+
+        </div>
+
+        <!-- ===== SUBMENU ===== -->
+
+        <div class="submenu-content">
+
+          <!-- ===== INVENTORY ===== -->
+
+          <div
+            class="inventory-item"
+            onclick="openInventory('anugrah','inventory')">
+
+            📦 Inventory
+
+          </div>
+
+          <!-- ===== SPAREPART ===== -->
+
+          <div
+            class="inventory-item"
+            onclick="openInventory('anugrah','sparepart')">
+
+            🔧 Sparepart
+
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
 
-    <!-- ⚙️ SETTING -->
+  </div>
+
+</div>
+
+<!-- ============================= -->
+<!-- ===== POPUP TABLE =========== -->
+<!-- ============================= -->
+
+<div id="inventoryTableContainer"></div>
+     <!-- ⚙️ SETTING -->
 <div class="setting-wrapper">
 
   <div class="setting-btn" onclick="toggleSettingMenu(event)">
@@ -157,6 +276,7 @@
         ▼ Monitoring VTS Pertamina Jambi
       </button>
 
+    
     </div>
     <!-- ================= PANEL UTAMA ================= -->
     <div id="slidePanel" class="slide-panel">
@@ -244,7 +364,9 @@
     </div>
 
   </header>
-
+<!-- AREA INVENTORY -->
+<div id="inventoryFrameContainer"></div>
+    
   <!-- Loader -->
   <div id="loaderOverlay">
     <div class="spinner"></div>
