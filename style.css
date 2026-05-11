@@ -3367,3 +3367,65 @@ grid-template-columns: repeat(4, 1fr);
 .monitoring-table tbody tr:hover td{
   background:#edf5ff;
 }
+/* ================= SETTING ================= */
+.setting-wrapper{
+    position:absolute;
+    top:12px;
+    right:130px;
+    z-index:1000;
+}
+
+/* gear polos */
+.setting-btn{
+    font-size:24px;
+    cursor:pointer;
+    user-select:none;
+    transition:.3s;
+    line-height:1;
+}
+
+.setting-btn:hover{
+    transform:rotate(90deg) scale(1.1);
+}
+
+/* dropdown */
+.setting-menu{
+    display:none;
+    position:absolute;
+    top:45px;
+    right:0;
+    width:240px;
+    background:white;
+    border-radius:12px;
+    padding:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,.18);
+}
+
+.setting-menu.show{
+    display:block;
+}
+
+.setting-menu h4{
+    margin:0 0 15px;
+}
+
+.upload-wallpaper{
+    display:block;
+    background:#2f56cc;
+    color:white;
+    padding:12px;
+    border-radius:10px;
+    text-align:center;
+    cursor:pointer;
+    margin-bottom:12px;
+}
+
+.reset-wallpaper{
+    width:100%;
+    border:none;
+    padding:12px;
+    border-radius:10px;
+    cursor:pointer;
+    background:#e53935;
+    color:white;
+}
