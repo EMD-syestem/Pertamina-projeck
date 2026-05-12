@@ -929,6 +929,60 @@ header {
 }
 
 /* =====================================================
+   SHEET HEADER
+===================================================== */
+
+.inventory-sheet-header {
+
+  text-align: center;
+
+  padding:
+    20px 10px 10px;
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(37,99,235,0.05),
+      transparent
+    );
+}
+
+.sheet-title {
+
+  font-size: 30px;
+
+  font-weight: 800;
+
+  color: #111827;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1px;
+
+  margin-bottom: 8px;
+}
+
+.sheet-name {
+
+  font-size: 18px;
+
+  font-weight: 700;
+
+  color: #1f2937;
+
+  margin-bottom: 5px;
+}
+
+.sheet-period {
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  color: #4b5563;
+}
+
+/* =====================================================
    TABLE WRAPPER
 ===================================================== */
 
@@ -983,15 +1037,11 @@ header {
 
   min-width: 950px;
 
-  border-collapse: separate;
-
-  border-spacing: 0;
-
-  overflow: hidden;
-
-  border-radius: 14px;
+  border-collapse: collapse;
 
   background: white;
+
+  table-layout: fixed;
 }
 
 /* =====================================================
@@ -1027,8 +1077,8 @@ header {
 
   letter-spacing: 0.3px;
 
-  border-bottom:
-    1px solid rgba(255,255,255,0.1);
+  border:
+    1px solid #d1d5db;
 
   white-space: nowrap;
 }
@@ -1053,9 +1103,6 @@ header {
 
   background:
     rgba(37,99,235,0.08);
-
-  transform:
-    scale(1.001);
 }
 
 /* =====================================================
@@ -1070,12 +1117,58 @@ header {
 
   color: #374151;
 
-  border-bottom:
-    1px solid #e5e7eb;
+  border:
+    1px solid #d1d5db;
 
   text-align: center;
 
   vertical-align: middle;
+
+  background: white;
+}
+
+/* =====================================================
+   ALIGNMENT
+===================================================== */
+
+.inventory-table td:nth-child(2),
+.inventory-table td:nth-child(4) {
+
+  text-align: left;
+}
+
+/* =====================================================
+   COLUMN SIZE
+===================================================== */
+
+.inventory-table th:nth-child(1),
+.inventory-table td:nth-child(1) {
+
+  width: 70px;
+}
+
+.inventory-table th:nth-child(2),
+.inventory-table td:nth-child(2) {
+
+  width: 35%;
+}
+
+.inventory-table th:nth-child(3),
+.inventory-table td:nth-child(3) {
+
+  width: 20%;
+}
+
+.inventory-table th:nth-child(4),
+.inventory-table td:nth-child(4) {
+
+  width: 30%;
+}
+
+.inventory-table th:nth-child(5),
+.inventory-table td:nth-child(5) {
+
+  width: 20%;
 }
 
 /* =====================================================
@@ -1094,6 +1187,7 @@ header {
 
   font-weight: 600;
 }
+
 /* =====================================================
    ANIMATION
 ===================================================== */
@@ -1150,6 +1244,21 @@ header {
   .inventory-table {
 
     min-width: 700px;
+  }
+
+  .sheet-title {
+
+    font-size: 22px;
+  }
+
+  .sheet-name {
+
+    font-size: 16px;
+  }
+
+  .sheet-period {
+
+    font-size: 13px;
   }
 }
 /* ============================= */
