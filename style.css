@@ -448,7 +448,7 @@ header {
 
   backdrop-filter: blur(4px);
 
-  transform: translateX(450px);
+  transform: translateX(380px);
 
   box-shadow:
     0 4px 14px rgba(0,0,0,0.12);
@@ -1021,12 +1021,16 @@ header {
 
   font-weight: 700;
 
-  text-align: left;
+  text-align: center;
+
+  vertical-align: middle;
 
   letter-spacing: 0.3px;
 
   border-bottom:
     1px solid rgba(255,255,255,0.1);
+
+  white-space: nowrap;
 }
 
 /* =====================================================
@@ -1068,6 +1072,10 @@ header {
 
   border-bottom:
     1px solid #e5e7eb;
+
+  text-align: center;
+
+  vertical-align: middle;
 }
 
 /* =====================================================
@@ -1086,7 +1094,6 @@ header {
 
   font-weight: 600;
 }
-
 /* =====================================================
    ANIMATION
 ===================================================== */
