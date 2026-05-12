@@ -639,7 +639,7 @@ async function openInventory(
       "🔧 Anugrah Sparepart";
   }
 
- /* =========================
+/* =========================
    GENERATE HTML
 ========================= */
 
@@ -676,6 +676,13 @@ if (
     headers.sparepart || {};
 }
 
+/* =========================
+   HEADER KOLOM
+========================= */
+
+const hasStatus =
+  subType === "sparepart";
+
 let html = `
 
 <div class="inventory-popup">
@@ -684,36 +691,41 @@ let html = `
 
     <h2>${title}</h2>
 
-    <button
-      onclick="closeInventoryPopup()">
-
+    <button onclick="closeInventoryPopup()">
       ✖
-
     </button>
 
   </div>
 
   <!-- =========================
-       HEADER SHEET
+       LAYOUT SHEET STYLE
   ========================== -->
 
-  <div class="inventory-sheet-header">
+  <div class="inventory-sheet-container">
 
-    <div class="sheet-title">
-      ${currentHeader.title || ""}
+    <!-- =========================
+         HEADER SHEET
+    ========================== -->
+
+    <div class="inventory-sheet-header">
+
+      <div class="sheet-title">
+        ${currentHeader.title || ""}
+      </div>
+
+      <div class="sheet-name">
+        ${currentHeader.name || ""}
+      </div>
+
+      <div class="sheet-period">
+        ${currentHeader.period || ""}
+      </div>
+
     </div>
 
-    <div class="sheet-name">
-      ${currentHeader.name || ""}
-    </div>
-
-    <div class="sheet-period">
-      ${currentHeader.period || ""}
-    </div>
-
-  </div>
-
-  <div class="inventory-table-wrapper">
+    <!-- =========================
+         TABLE
+    ========================== -->
 
     <table class="inventory-table">
 
@@ -721,17 +733,17 @@ let html = `
 
         <tr>
 
-          <th>No</th>
+          <th class="col-no">No</th>
 
-          <th>Barang</th>
+          <th class="col-barang">Barang</th>
 
-          <th>Jumlah</th>
+          <th class="col-jumlah">Jumlah</th>
 
-          <th>Merek</th>
+          <th class="col-merek">Merek</th>
 
           ${
-            subType === "sparepart"
-            ? "<th>Status</th>"
+            hasStatus
+            ? `<th class="col-status">Status</th>`
             : ""
           }
 
@@ -752,12 +764,9 @@ if (!data.length) {
 
     <tr>
 
-      <td colspan="${
-        subType === "sparepart"
-        ? "5"
-        : "4"
-      }"
-      class="inventory-empty">
+      <td
+        colspan="${hasStatus ? 5 : 4}"
+        class="inventory-empty">
 
         Data inventory kosong
 
@@ -777,17 +786,29 @@ data.forEach(item => {
 
     <tr>
 
-      <td>${item.no || ""}</td>
+      <td class="text-center">
+        ${item.no || ""}
+      </td>
 
-      <td>${item.barang || ""}</td>
+      <td>
+        ${item.barang || ""}
+      </td>
 
-      <td>${item.jumlah || ""}</td>
+      <td class="text-center">
+        ${item.jumlah || ""}
+      </td>
 
-      <td>${item.merek || ""}</td>
+      <td>
+        ${item.merek || ""}
+      </td>
 
       ${
-        subType === "sparepart"
-        ? `<td>${item.status || ""}</td>`
+        hasStatus
+        ? `
+          <td class="text-center">
+            ${item.status || ""}
+          </td>
+        `
         : ""
       }
 
