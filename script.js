@@ -467,415 +467,6 @@ function renderFeed(data) {
   onlineUsersBox.innerHTML = html;
 }
 
-/* =========================
-   API INVENTORY
-========================= */
-
-const INVENTORY_API =
-  "https://script.google.com/macros/s/AKfycbzb6INRZ886muwUIuRO2zilaxOpcqgeARJNqSx3_pDeRynzhZ9AECBhYrKQpWH_GFGceg/exec?type=inventory";
-
-/* =========================
-   DATA GLOBAL
-========================= */
-
-let inventoryData = null;
-
-/* =========================
-   LOAD DATA
-========================= */
-
-async function loadInventoryData() {
-
-  try {
-
-    const res = await fetch(INVENTORY_API);
-
-    inventoryData = await res.json();
-
-    console.log(
-      "✅ Inventory Loaded:",
-      inventoryData
-    );
-
-  } catch(err) {
-
-    console.error(
-      "❌ Gagal load inventory:",
-      err
-    );
-  }
-}
-
-/* =========================
-   LOAD AWAL
-========================= */
-
-loadInventoryData();
-
-/* =========================
-   TOGGLE MENU
-========================= */
-
-function toggleInventoryMenu() {
-
-  const menu =
-    document.getElementById(
-      "inventoryMenu"
-    );
-
-  menu.classList.toggle("show");
-}
-
-/* =========================
-   OPEN INVENTORY
-========================= */
-
-async function openInventory(
-  type,
-  subType = ""
-) {
-
-  /* =========================
-     LOAD DATA JIKA NULL
-  ========================= */
-
-  if (!inventoryData) {
-
-    try {
-
-      const res =
-        await fetch(INVENTORY_API);
-
-      inventoryData =
-        await res.json();
-
-    } catch(err) {
-
-      console.error(err);
-
-      alert(
-        "Gagal mengambil data inventory"
-      );
-
-      return;
-    }
-  }
-
-  /* =========================
-     CONTAINER
-  ========================= */
-
-  const container =
-    document.getElementById(
-      "inventoryFrameContainer"
-    );
-
-  let data = [];
-
-  /* =========================
-     DERI
-  ========================= */
-
-  if (type === "deri") {
-
-    data =
-      inventoryData.deri || [];
-  }
-
-  /* =========================
-     ANUGRAH INVENTORY
-  ========================= */
-
-  if (
-    type === "anugrah" &&
-    subType === "inventory"
-  ) {
-
-    data =
-      inventoryData.anugrah.inventory || [];
-  }
-
-  /* =========================
-     ANUGRAH SPAREPART
-  ========================= */
-
-  if (
-    type === "anugrah" &&
-    subType === "sparepart"
-  ) {
-
-    data =
-      inventoryData.anugrah.sparepart || [];
-  }
-
-  /* =========================
-     TITLE
-  ========================= */
-
-  let title =
-    "Inventory";
-
-  if (type === "deri") {
-
-    title =
-      "📦 Deri Inventory";
-  }
-
-  if (
-    type === "anugrah" &&
-    subType === "inventory"
-  ) {
-
-    title =
-      "📦 Anugrah Inventory";
-  }
-
-  if (
-    type === "anugrah" &&
-    subType === "sparepart"
-  ) {
-
-    title =
-      "🔧 Anugrah Sparepart";
-  }
-
-/* =========================
-   GENERATE HTML
-========================= */
-
-const headers =
-  inventoryData.headers || {};
-
-/* =========================
-   PILIH HEADER SESUAI TYPE
-========================= */
-
-let currentHeader = {};
-
-if (type === "deri") {
-
-  currentHeader =
-    headers.deri || {};
-}
-
-if (
-  type === "anugrah" &&
-  subType === "inventory"
-) {
-
-  currentHeader =
-    headers.anugrah || {};
-}
-
-if (
-  type === "anugrah" &&
-  subType === "sparepart"
-) {
-
-  currentHeader =
-    headers.sparepart || {};
-}
-
-/* =========================
-   HEADER KOLOM
-========================= */
-
-const hasStatus =
-  subType === "sparepart";
-
-let html = `
-
-<div class="inventory-popup">
-
-  <div class="inventory-popup-header">
-
-    <h2>${title}</h2>
-
-    <button onclick="closeInventoryPopup()">
-      ✖
-    </button>
-
-  </div>
-
-  <!-- =========================
-       LAYOUT SHEET STYLE
-  ========================== -->
-
-  <div class="inventory-sheet-container">
-
-    <!-- =========================
-         HEADER SHEET
-    ========================== -->
-
-    <div class="inventory-sheet-header">
-
-      <div class="sheet-title">
-        ${currentHeader.title || ""}
-      </div>
-
-      <div class="sheet-name">
-        ${currentHeader.name || ""}
-      </div>
-
-      <div class="sheet-period">
-        ${currentHeader.period || ""}
-      </div>
-
-    </div>
-
-    <!-- =========================
-         TABLE
-    ========================== -->
-
-    <table class="inventory-table">
-
-      <thead>
-
-        <tr>
-
-          <th class="col-no">No</th>
-
-          <th class="col-barang">Barang</th>
-
-          <th class="col-jumlah">Jumlah</th>
-
-          <th class="col-merek">Merek</th>
-
-          ${
-            hasStatus
-            ? `<th class="col-status">Status</th>`
-            : ""
-          }
-
-        </tr>
-
-      </thead>
-
-      <tbody>
-`;
-
-/* =========================
-   DATA KOSONG
-========================= */
-
-if (!data.length) {
-
-  html += `
-
-    <tr>
-
-      <td
-        colspan="${hasStatus ? 5 : 4}"
-        class="inventory-empty">
-
-        Data inventory kosong
-
-      </td>
-
-    </tr>
-  `;
-}
-
-/* =========================
-   LOOP DATA
-========================= */
-
-data.forEach(item => {
-
-  html += `
-
-    <tr>
-
-      <td class="text-center">
-        ${item.no || ""}
-      </td>
-
-      <td>
-        ${item.barang || ""}
-      </td>
-
-      <td class="text-center">
-        ${item.jumlah || ""}
-      </td>
-
-      <td>
-        ${item.merek || ""}
-      </td>
-
-      ${
-        hasStatus
-        ? `
-          <td class="text-center">
-            ${item.status || ""}
-          </td>
-        `
-        : ""
-      }
-
-    </tr>
-  `;
-});
-
-html += `
-
-      </tbody>
-
-    </table>
-
-  </div>
-
-</div>
-`;
-  /* =========================
-     RENDER
-  ========================= */
-
-  container.innerHTML = html;
-
-  /* =========================
-     CLOSE MENU
-  ========================= */
-
-  document
-    .getElementById("inventoryMenu")
-    .classList.remove("show");
-}
-/* =========================
-   CLOSE POPUP
-========================= */
-
-function closeInventoryPopup() {
-
-  document.getElementById(
-    "inventoryFrameContainer"
-  ).innerHTML = "";
-}
-/* =========================
-   KLIK LUAR MENU
-========================= */
-
-document.addEventListener(
-  "click",
-  function(e) {
-
-    const dropdown =
-      document.querySelector(
-        ".inventory-dropdown"
-      );
-
-    if (
-      dropdown &&
-      !dropdown.contains(e.target)
-    ) {
-
-      document
-        .getElementById(
-          "inventoryMenu"
-        )
-        .classList.remove("show");
-    }
-  }
-);
 // ===================== SHOW LOGIN =====================
 function showLoginPage() {
   document.querySelector("header").style.display = "none";
@@ -5812,3 +5403,413 @@ function resetWallpaper(){
 
     document.getElementById("settingMenu").classList.remove("show");
 }
+
+/* =========================
+   API INVENTORY
+========================= */
+
+const INVENTORY_API =
+  "https://script.google.com/macros/s/AKfycbzb6INRZ886muwUIuRO2zilaxOpcqgeARJNqSx3_pDeRynzhZ9AECBhYrKQpWH_GFGceg/exec?type=inventory";
+
+/* =========================
+   DATA GLOBAL
+========================= */
+
+let inventoryData = null;
+
+/* =========================
+   LOAD DATA
+========================= */
+
+async function loadInventoryData() {
+
+  try {
+
+    const res = await fetch(INVENTORY_API);
+
+    inventoryData = await res.json();
+
+    console.log(
+      "✅ Inventory Loaded:",
+      inventoryData
+    );
+
+  } catch(err) {
+
+    console.error(
+      "❌ Gagal load inventory:",
+      err
+    );
+  }
+}
+
+/* =========================
+   LOAD AWAL
+========================= */
+
+loadInventoryData();
+
+/* =========================
+   TOGGLE MENU
+========================= */
+
+function toggleInventoryMenu() {
+
+  const menu =
+    document.getElementById(
+      "inventoryMenu"
+    );
+
+  menu.classList.toggle("show");
+}
+
+/* =========================
+   OPEN INVENTORY
+========================= */
+
+async function openInventory(
+  type,
+  subType = ""
+) {
+
+  /* =========================
+     LOAD DATA JIKA NULL
+  ========================= */
+
+  if (!inventoryData) {
+
+    try {
+
+      const res =
+        await fetch(INVENTORY_API);
+
+      inventoryData =
+        await res.json();
+
+    } catch(err) {
+
+      console.error(err);
+
+      alert(
+        "Gagal mengambil data inventory"
+      );
+
+      return;
+    }
+  }
+
+  /* =========================
+     CONTAINER
+  ========================= */
+
+  const container =
+    document.getElementById(
+      "inventoryFrameContainer"
+    );
+
+  let data = [];
+
+  /* =========================
+     DERI
+  ========================= */
+
+  if (type === "deri") {
+
+    data =
+      inventoryData.deri || [];
+  }
+
+  /* =========================
+     ANUGRAH INVENTORY
+  ========================= */
+
+  if (
+    type === "anugrah" &&
+    subType === "inventory"
+  ) {
+
+    data =
+      inventoryData.anugrah.inventory || [];
+  }
+
+  /* =========================
+     ANUGRAH SPAREPART
+  ========================= */
+
+  if (
+    type === "anugrah" &&
+    subType === "sparepart"
+  ) {
+
+    data =
+      inventoryData.anugrah.sparepart || [];
+  }
+
+  /* =========================
+     TITLE
+  ========================= */
+
+  let title =
+    "Inventory";
+
+  if (type === "deri") {
+
+    title =
+      "📦 Deri Inventory";
+  }
+
+  if (
+    type === "anugrah" &&
+    subType === "inventory"
+  ) {
+
+    title =
+      "📦 Anugrah Inventory";
+  }
+
+  if (
+    type === "anugrah" &&
+    subType === "sparepart"
+  ) {
+
+    title =
+      "🔧 Anugrah Sparepart";
+  }
+
+/* =========================
+   GENERATE HTML
+========================= */
+
+const headers =
+  inventoryData.headers || {};
+
+/* =========================
+   PILIH HEADER SESUAI TYPE
+========================= */
+
+let currentHeader = {};
+
+if (type === "deri") {
+
+  currentHeader =
+    headers.deri || {};
+}
+
+if (
+  type === "anugrah" &&
+  subType === "inventory"
+) {
+
+  currentHeader =
+    headers.anugrah || {};
+}
+
+if (
+  type === "anugrah" &&
+  subType === "sparepart"
+) {
+
+  currentHeader =
+    headers.sparepart || {};
+}
+
+/* =========================
+   HEADER KOLOM
+========================= */
+
+const hasStatus =
+  subType === "sparepart";
+
+let html = `
+
+<div class="inventory-popup">
+
+  <div class="inventory-popup-header">
+
+    <h2>${title}</h2>
+
+    <button onclick="closeInventoryPopup()">
+      ✖
+    </button>
+
+  </div>
+
+  <!-- =========================
+       LAYOUT SHEET STYLE
+  ========================== -->
+
+  <div class="inventory-sheet-container">
+
+    <!-- =========================
+         HEADER SHEET
+    ========================== -->
+
+    <div class="inventory-sheet-header">
+
+      <div class="sheet-title">
+        ${currentHeader.title || ""}
+      </div>
+
+      <div class="sheet-name">
+        ${currentHeader.name || ""}
+      </div>
+
+      <div class="sheet-period">
+        ${currentHeader.period || ""}
+      </div>
+
+    </div>
+
+    <!-- =========================
+         TABLE
+    ========================== -->
+
+    <table class="inventory-table">
+
+      <thead>
+
+        <tr>
+
+          <th class="col-no">No</th>
+
+          <th class="col-barang">Barang</th>
+
+          <th class="col-jumlah">Jumlah</th>
+
+          <th class="col-merek">Merek</th>
+
+          ${
+            hasStatus
+            ? `<th class="col-status">Status</th>`
+            : ""
+          }
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+`;
+
+/* =========================
+   DATA KOSONG
+========================= */
+
+if (!data.length) {
+
+  html += `
+
+    <tr>
+
+      <td
+        colspan="${hasStatus ? 5 : 4}"
+        class="inventory-empty">
+
+        Data inventory kosong
+
+      </td>
+
+    </tr>
+  `;
+}
+
+/* =========================
+   LOOP DATA
+========================= */
+
+data.forEach(item => {
+
+  html += `
+
+    <tr>
+
+      <td class="text-center">
+        ${item.no || ""}
+      </td>
+
+      <td>
+        ${item.barang || ""}
+      </td>
+
+      <td class="text-center">
+        ${item.jumlah || ""}
+      </td>
+
+      <td>
+        ${item.merek || ""}
+      </td>
+
+      ${
+        hasStatus
+        ? `
+          <td class="text-center">
+            ${item.status || ""}
+          </td>
+        `
+        : ""
+      }
+
+    </tr>
+  `;
+});
+
+html += `
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
+`;
+  /* =========================
+     RENDER
+  ========================= */
+
+  container.innerHTML = html;
+
+  /* =========================
+     CLOSE MENU
+  ========================= */
+
+  document
+    .getElementById("inventoryMenu")
+    .classList.remove("show");
+}
+/* =========================
+   CLOSE POPUP
+========================= */
+
+function closeInventoryPopup() {
+
+  document.getElementById(
+    "inventoryFrameContainer"
+  ).innerHTML = "";
+}
+/* =========================
+   KLIK LUAR MENU
+========================= */
+
+document.addEventListener(
+  "click",
+  function(e) {
+
+    const dropdown =
+      document.querySelector(
+        ".inventory-dropdown"
+      );
+
+    if (
+      dropdown &&
+      !dropdown.contains(e.target)
+    ) {
+
+      document
+        .getElementById(
+          "inventoryMenu"
+        )
+        .classList.remove("show");
+    }
+  }
+);
