@@ -1,3 +1,1190 @@
+/// ===================== LOGIN SECTION (GOOGLE SHEET) =====================
+const SHEET_API =
+  "https://script.google.com/macros/s/AKfycbzb6INRZ886muwUIuRO2zilaxOpcqgeARJNqSx3_pDeRynzhZ9AECBhYrKQpWH_GFGceg/exec";
+
+let users = [];
+let onlineInterval = null;
+let currentChatUser = null;
+let chatInterval = null;
+
+/* chat yang sedang dibuka */
+let openedChatEmail = null;
+
+// ===================== LOAD USER =====================
+async function loadUsers() {
+  try {
+    const res = await fetch(SHEET_API);
+    users = await res.json();
+    console.log("Users loaded:", users);
+  } catch (err) {
+    console.error("Gagal load user:", err);
+  }
+}
+// ===================== UPDATE STATUS =====================
+async function updateUserStatus(email, status, note = "") {
+  try {
+    await fetch(
+      `${SHEET_API}?type=status&email=${encodeURIComponent(
+        email
+      )}&status=${encodeURIComponent(status)}&note=${encodeURIComponent(note)}`
+    );
+  } catch (err) {
+    console.error("Update status gagal:", err);
+  }
+}
+
+// ===================== LOAD ONLINE USERS =====================
+async function loadOnlineUsers() {
+  try {
+    window.userCallback = function (data) {
+      const online = data.filter(
+        (x) => String(x.Status || "").toLowerCase() === "online"
+      );
+
+      const onlineUsersBox = document.getElementById("onlineUsers");
+
+      const onlineCount = document.getElementById("onlineCount");
+
+      if (!onlineUsersBox || !onlineCount) return;
+
+      // update jumlah online
+      onlineCount.textContent = online.length;
+
+      // cek apakah chat yg sedang dibuka masih online
+      if (openedChatEmail) {
+        const stillOnline = online.some((x) => x.Email === openedChatEmail);
+
+        // kalau user yg diajak chat offline → tutup chat
+        if (!stillOnline) {
+          closeChat(openedChatEmail);
+        }
+      }
+
+      // ==================================================
+      // JANGAN render ulang kalau chat sedang dibuka
+      // supaya textbox tidak hilang focus
+      // ==================================================
+     if (!openedChatEmail) {
+
+  const me = (localStorage.getItem("currentUser") || "").toLowerCase();
+
+  onlineUsersBox.innerHTML = online.map(user => {
+
+    const isMe =
+      String(user.Email || "").toLowerCase() === me;
+
+    const lastChat = (user.Chat || "")
+      .split("\n")
+      .slice(-1)[0]
+      .replace(/\[.*?\]\s*/, "");
+
+    return `
+      <div class="online-wrap">
+
+        <div
+          class="online-user ${isMe ? 'clickable' : 'disabled'}"
+          ${isMe ? `onclick="openChat('${user.Email}','${user.Nama}')"` : ""}
+        >
+          <img src="${
+            user.Foto ||
+            "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+          }">
+
+          <div class="online-user-info">
+
+            <div class="online-user-name">
+              ${user.Nama || "-"}
+            </div>
+
+            <div class="online-user-loc">
+              ${user.Lokasi || "-"}
+            </div>
+
+            <div class="online-user-chat">
+              ${lastChat}
+            </div>
+
+          </div>
+
+          <div class="online-dot"></div>
+        </div>
+
+        <div id="chat-${user.Email}" class="inline-chat hidden"></div>
+
+      </div>
+    `;
+  }).join("");
+}
+
+      // ==================================================
+// kalau chat sedang dibuka, update count saja
+// tidak redraw DOM
+// ==================================================
+if (openedChatEmail) {
+  const activeUser = online.find(
+    (x) => x.Email === openedChatEmail
+  );
+
+  if (activeUser) {
+    const chatBox = document.getElementById(
+      "chat-" + activeUser.Email
+    );
+
+    // kalau DOM chat belum ada → buat ulang
+    if (!chatBox) {
+
+      const me = (localStorage.getItem("currentUser") || "").toLowerCase();
+
+      onlineUsersBox.innerHTML = online.map(user => {
+
+        const isMe =
+          String(user.Email || "").toLowerCase() === me;
+
+        const lastChat = (user.Chat || "")
+          .split("\n")
+          .slice(-1)[0]
+          .replace(/\[.*?\]\s*/, "");
+
+        return `
+          <div class="online-wrap">
+
+            <div
+              class="online-user ${isMe ? 'clickable' : 'disabled'}"
+              ${isMe ? `onclick="openChat('${user.Email}','${user.Nama}')"` : ""}
+            >
+              <img src="${
+                user.Foto ||
+                "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+              }">
+
+              <div class="online-user-info">
+
+                <div class="online-user-name">
+                  ${user.Nama || "-"}
+                </div>
+
+                <div class="online-user-loc">
+                  ${user.Lokasi || "-"}
+                </div>
+
+                <div class="online-user-chat">
+                  ${lastChat}
+                </div>
+
+              </div>
+
+              <div class="online-dot"></div>
+            </div>
+
+            <div id="chat-${user.Email}" class="inline-chat hidden"></div>
+
+          </div>
+        `;
+      }).join("");
+
+      openChat(
+        activeUser.Email,
+        activeUser.Nama,
+        true
+      );
+    }
+  }
+}
+    };
+
+    const old = document.getElementById("userJsonp");
+
+    if (old) old.remove();
+
+    const script = document.createElement("script");
+
+    script.id = "userJsonp";
+
+    script.src = `${SHEET_API}?callback=userCallback&t=${Date.now()}`;
+
+    document.body.appendChild(script);
+  } catch (err) {
+    console.error("Load online user gagal:", err);
+  }
+}
+// ===================== OPEN CHAT =====================
+function openChat(email, nama, reopen = false) {
+  // jika klik user yg sama, skip
+  if (!reopen && openedChatEmail === email) return;
+
+  openedChatEmail = email;
+  currentChatUser = email;
+
+  // tutup panel lain TANPA hapus isi
+  document.querySelectorAll(".inline-chat").forEach((el) => {
+    if (el.id !== "chat-" + email) {
+      el.classList.add("hidden");
+    }
+  });
+
+  const chatBox = document.getElementById("chat-" + email);
+  if (!chatBox) return;
+
+  chatBox.classList.remove("hidden");
+
+  // hanya buat UI kalau belum ada
+  if (!chatBox.innerHTML.trim()) {
+    chatBox.innerHTML = `
+      <div class="inline-chat-header">
+        <span>💬 ${nama}</span>
+
+        <button onclick="closeChat('${email}')">
+          ✖
+        </button>
+      </div>
+
+      <div id="chatBox-${email}" class="inline-chat-box">
+        <div class="chat-messages"></div>
+
+        <!-- TEXTAREA INPUT -->
+        <textarea
+          id="chatInput-${email}"
+          class="chat-textarea"
+          placeholder="Ketik pesan..."
+          onkeydown="
+            if(event.key === 'Enter' && !event.shiftKey){
+              event.preventDefault();
+              sendChat('${email}');
+            }
+          "
+        ></textarea>
+      </div>
+
+      <!-- BUTTON PANEL -->
+      <div class="inline-chat-input">
+
+        <button onclick="sendChat('${email}')">
+          Kirim
+        </button>
+
+        <button onclick="closeChat('${email}')">
+          Batal
+        </button>
+
+        <button onclick="clearChat('${email}')">
+          Hapus
+        </button>
+
+      </div>
+    `;
+  }
+
+  // fokus ke textarea
+  setTimeout(() => {
+    const input = document.getElementById("chatInput-" + email);
+    if (input) input.focus();
+  }, 100);
+
+  // load chat
+  loadChat();
+
+  // auto refresh
+  if (chatInterval) clearInterval(chatInterval);
+
+  chatInterval = setInterval(loadChat, 3000);
+}
+// ===================== CLOSE CHAT =====================
+function closeChat(email) {
+  openedChatEmail = null;
+  currentChatUser = null;
+
+  const box = document.getElementById("chat-" + email);
+
+  if (box) {
+    box.classList.add("hidden");
+    box.innerHTML = "";
+  }
+
+  if (chatInterval) {
+    clearInterval(chatInterval);
+    chatInterval = null;
+  }
+}
+
+// ===================== LOAD CHAT =====================
+async function loadChatFeed() {
+  window.feedCallback = function (data) {
+    renderFeed(data);
+  };
+
+  const old = document.getElementById("feedJsonp");
+  if (old) old.remove();
+
+  const script = document.createElement("script");
+  script.id = "feedJsonp";
+  script.src = `${SHEET_API}?type=feed&callback=feedCallback&t=${Date.now()}`;
+  document.body.appendChild(script);
+}
+// ===================== SEND CHAT =====================
+async function sendChat(email = currentChatUser) {
+  if (!email) return;
+
+  const input = document.getElementById("chatInput-" + email);
+
+  if (!input) return;
+
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  const from = localStorage.getItem("currentUser").toLowerCase();
+
+  try {
+    const oldScript = document.getElementById("sendJsonp");
+
+    if (oldScript) oldScript.remove();
+
+    window.sendCallback = function (res) {
+      console.log("Chat terkirim:", res);
+
+      input.value = "";
+      loadChat();
+      input.focus();
+    };
+
+    const script = document.createElement("script");
+
+    script.id = "sendJsonp";
+
+    script.src =
+      `${SHEET_API}?type=sendChat` +
+      `&from=${encodeURIComponent(from)}` +
+      `&to=${encodeURIComponent(email)}` +
+      `&message=${encodeURIComponent(msg)}` +
+      `&callback=sendCallback` +
+      `&t=${Date.now()}`;
+
+    document.body.appendChild(script);
+  } catch (err) {
+    console.error("Send chat gagal:", err);
+  }
+}
+
+function loadChat() {
+  console.log("reload chat...");
+  // ambil ulang data chat dari server / sheet
+}
+// ===================== RENDER CHAT =====================
+function renderChat(data) {
+  const me = localStorage.getItem("currentUser");
+
+  if (!currentChatUser) return;
+
+  const filtered = data.filter(
+    (x) =>
+      (String(x.From).trim() === me &&
+        String(x.To).trim() === currentChatUser) ||
+      (String(x.From).trim() === currentChatUser && String(x.To).trim() === me)
+  );
+
+  const chatBox = document.getElementById("chatBox-" + currentChatUser);
+
+  if (!chatBox) return;
+
+  chatBox.innerHTML = filtered
+    .map(
+      (msg) => `
+    <div class="chat-item ${String(msg.From).trim() === me ? "me" : ""}">
+      ${msg.Message}
+    </div>
+  `
+    )
+    .join("");
+
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+// ===================== SHOW DASHBOARD =====================
+async function showDashboard(user) {
+  document.getElementById("loginPage").style.display = "none";
+  document.querySelector("header").style.display = "flex";
+  document.querySelector("main").style.display = "block";
+
+  // tanggal
+  const now = new Date();
+  document.getElementById("current-date").textContent = now.toLocaleDateString(
+    "id-ID",
+    {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    }
+  );
+
+  // foto + nama
+  const userInfoImg = document.querySelector(".user-info img");
+  const userInfoText = document.querySelector(".user-info span");
+
+  userInfoImg.src =
+    user.Foto || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+  userInfoText.textContent = user.Nama || user.Email.split("@")[0];
+
+  // load dashboard
+  showDashboardMaintenance();
+
+  // load user online
+  await loadOnlineUsers();
+
+  if (!onlineInterval) {
+    onlineInterval = setInterval(loadOnlineUsers, 5000);
+  }
+}
+function renderFeed(data) {
+  const onlineUsersBox = document.getElementById("onlineUsers");
+
+  if (!onlineUsersBox) return;
+
+  let html = "";
+
+  data
+    .slice(-20)
+    .reverse()
+    .forEach((item) => {
+      const user = users.find(
+        (u) => String(u.Email).toLowerCase() === String(item.from).toLowerCase()
+      );
+
+      const foto =
+        user?.Foto || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+      html += `
+      <div class="feed-item">
+        <img src="${foto}" class="feed-avatar">
+
+        <div class="feed-text">
+          <b>${item.from}</b><br>
+          ${item.message}
+        </div>
+      </div>
+    `;
+    });
+
+  onlineUsersBox.innerHTML = html;
+}
+
+/* =========================
+   API INVENTORY
+========================= */
+
+const INVENTORY_API =
+  "https://script.google.com/macros/s/AKfycbzb6INRZ886muwUIuRO2zilaxOpcqgeARJNqSx3_pDeRynzhZ9AECBhYrKQpWH_GFGceg/exec?type=inventory";
+
+/* =========================
+   DATA GLOBAL
+========================= */
+
+let inventoryData = null;
+
+/* =========================
+   LOAD DATA
+========================= */
+
+async function loadInventoryData() {
+
+  try {
+
+    const res = await fetch(INVENTORY_API);
+
+    inventoryData = await res.json();
+
+    console.log(
+      "✅ Inventory Loaded:",
+      inventoryData
+    );
+
+  } catch(err) {
+
+    console.error(
+      "❌ Gagal load inventory:",
+      err
+    );
+  }
+}
+
+/* =========================
+   LOAD AWAL
+========================= */
+
+loadInventoryData();
+
+/* =========================
+   TOGGLE MENU
+========================= */
+
+function toggleInventoryMenu() {
+
+  const menu =
+    document.getElementById(
+      "inventoryMenu"
+    );
+
+  menu.classList.toggle("show");
+}
+
+/* =========================
+   OPEN INVENTORY
+========================= */
+
+async function openInventory(
+  type,
+  subType = ""
+) {
+
+  /* =========================
+     LOAD DATA JIKA NULL
+  ========================= */
+
+  if (!inventoryData) {
+
+    try {
+
+      const res =
+        await fetch(INVENTORY_API);
+
+      inventoryData =
+        await res.json();
+
+    } catch(err) {
+
+      console.error(err);
+
+      alert(
+        "Gagal mengambil data inventory"
+      );
+
+      return;
+    }
+  }
+
+  /* =========================
+     CONTAINER
+  ========================= */
+
+  const container =
+    document.getElementById(
+      "inventoryFrameContainer"
+    );
+
+  let data = [];
+
+  /* =========================
+     DERI
+  ========================= */
+
+  if (type === "deri") {
+
+    data =
+      inventoryData.deri || [];
+  }
+
+  /* =========================
+     ANUGRAH INVENTORY
+  ========================= */
+
+  if (
+    type === "anugrah" &&
+    subType === "inventory"
+  ) {
+
+    data =
+      inventoryData.anugrah.inventory || [];
+  }
+
+  /* =========================
+     ANUGRAH SPAREPART
+  ========================= */
+
+  if (
+    type === "anugrah" &&
+    subType === "sparepart"
+  ) {
+
+    data =
+      inventoryData.anugrah.sparepart || [];
+  }
+
+  /* =========================
+     TITLE
+  ========================= */
+
+  let title =
+    "Inventory";
+
+  if (type === "deri") {
+
+    title =
+      "📦 Deri Inventory";
+  }
+
+  if (
+    type === "anugrah" &&
+    subType === "inventory"
+  ) {
+
+    title =
+      "📦 Anugrah Inventory";
+  }
+
+  if (
+    type === "anugrah" &&
+    subType === "sparepart"
+  ) {
+
+    title =
+      "🔧 Anugrah Sparepart";
+  }
+
+/* =========================
+   GENERATE HTML
+========================= */
+
+const headers =
+  inventoryData.headers || {};
+
+/* =========================
+   PILIH HEADER SESUAI TYPE
+========================= */
+
+let currentHeader = {};
+
+if (type === "deri") {
+
+  currentHeader =
+    headers.deri || {};
+}
+
+if (
+  type === "anugrah" &&
+  subType === "inventory"
+) {
+
+  currentHeader =
+    headers.anugrah || {};
+}
+
+if (
+  type === "anugrah" &&
+  subType === "sparepart"
+) {
+
+  currentHeader =
+    headers.sparepart || {};
+}
+
+/* =========================
+   HEADER KOLOM
+========================= */
+
+const hasStatus =
+  subType === "sparepart";
+
+let html = `
+
+<div class="inventory-popup">
+
+  <div class="inventory-popup-header">
+
+    <h2>${title}</h2>
+
+    <button onclick="closeInventoryPopup()">
+      ✖
+    </button>
+
+  </div>
+
+  <!-- =========================
+       LAYOUT SHEET STYLE
+  ========================== -->
+
+  <div class="inventory-sheet-container">
+
+    <!-- =========================
+         HEADER SHEET
+    ========================== -->
+
+    <div class="inventory-sheet-header">
+
+      <div class="sheet-title">
+        ${currentHeader.title || ""}
+      </div>
+
+      <div class="sheet-name">
+        ${currentHeader.name || ""}
+      </div>
+
+      <div class="sheet-period">
+        ${currentHeader.period || ""}
+      </div>
+
+    </div>
+
+    <!-- =========================
+         TABLE
+    ========================== -->
+
+    <table class="inventory-table">
+
+      <thead>
+
+        <tr>
+
+          <th class="col-no">No</th>
+
+          <th class="col-barang">Barang</th>
+
+          <th class="col-jumlah">Jumlah</th>
+
+          <th class="col-merek">Merek</th>
+
+          ${
+            hasStatus
+            ? `<th class="col-status">Status</th>`
+            : ""
+          }
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+`;
+
+/* =========================
+   DATA KOSONG
+========================= */
+
+if (!data.length) {
+
+  html += `
+
+    <tr>
+
+      <td
+        colspan="${hasStatus ? 5 : 4}"
+        class="inventory-empty">
+
+        Data inventory kosong
+
+      </td>
+
+    </tr>
+  `;
+}
+
+/* =========================
+   LOOP DATA
+========================= */
+
+data.forEach(item => {
+
+  html += `
+
+    <tr>
+
+      <td class="text-center">
+        ${item.no || ""}
+      </td>
+
+      <td>
+        ${item.barang || ""}
+      </td>
+
+      <td class="text-center">
+        ${item.jumlah || ""}
+      </td>
+
+      <td>
+        ${item.merek || ""}
+      </td>
+
+      ${
+        hasStatus
+        ? `
+          <td class="text-center">
+            ${item.status || ""}
+          </td>
+        `
+        : ""
+      }
+
+    </tr>
+  `;
+});
+
+html += `
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
+`;
+  /* =========================
+     RENDER
+  ========================= */
+
+  container.innerHTML = html;
+
+  /* =========================
+     CLOSE MENU
+  ========================= */
+
+  document
+    .getElementById("inventoryMenu")
+    .classList.remove("show");
+}
+/* =========================
+   CLOSE POPUP
+========================= */
+
+function closeInventoryPopup() {
+
+  document.getElementById(
+    "inventoryFrameContainer"
+  ).innerHTML = "";
+}
+/* =========================
+   KLIK LUAR MENU
+========================= */
+
+document.addEventListener(
+  "click",
+  function(e) {
+
+    const dropdown =
+      document.querySelector(
+        ".inventory-dropdown"
+      );
+
+    if (
+      dropdown &&
+      !dropdown.contains(e.target)
+    ) {
+
+      document
+        .getElementById(
+          "inventoryMenu"
+        )
+        .classList.remove("show");
+    }
+  }
+);
+// ===================== SHOW LOGIN =====================
+function showLoginPage() {
+  document.querySelector("header").style.display = "none";
+  document.querySelector("main").style.display = "none";
+  document.getElementById("loginPage").style.display = "flex";
+}
+
+// ===================== LOGIN =====================
+async function login() {
+  const email = document.getElementById("loginEmail").value.trim();
+  const pass = document.getElementById("loginPassword").value.trim();
+  const err = document.getElementById("loginError");
+
+  showLoader();
+
+  try {
+    if (!users.length) {
+      await loadUsers();
+    }
+
+    const user = users.find(
+      (u) =>
+        String(u.Email).trim() === email && String(u.Password).trim() === pass
+    );
+
+    if (!user) {
+      err.textContent = "❌ Email atau password salah!";
+      hideLoader();
+      return;
+    }
+
+    err.textContent = "";
+
+    localStorage.setItem("currentUser", user.Email);
+    localStorage.setItem("currentJobPrefix", user.Lokasi || "UNKN");
+
+    await updateUserStatus(user.Email, "Online", "Login");
+
+    await showDashboard(user);
+  } catch (error) {
+    console.error(error);
+    err.textContent = "❌ Gagal login";
+  }
+
+  hideLoader();
+}
+
+// ===================== TAMPILAN AWAL =====================
+window.addEventListener("DOMContentLoaded", async () => {
+  showLoginPage();
+
+  await loadUsers();
+
+  const savedUser = localStorage.getItem("currentUser");
+
+  if (!savedUser) return;
+
+  const user = users.find((u) => String(u.Email).trim() === savedUser);
+
+  if (!user) {
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("currentJobPrefix");
+    return;
+  }
+
+  await updateUserStatus(savedUser, "Online", "Auto Login");
+
+  await showDashboard(user);
+});
+
+// ===================== TAB DITUTUP =====================
+window.addEventListener("beforeunload", async () => {
+  const currentUser = localStorage.getItem("currentUser");
+
+  if (currentUser) {
+    await updateUserStatus(currentUser, "Offline", "Logout");
+  }
+});
+async function logout() {
+  showLoader();
+
+  const currentUser = localStorage.getItem("currentUser");
+
+  try {
+    // update status ke Google Sheet
+    if (currentUser) {
+      await updateUserStatus(currentUser, "Offline", "Logout");
+    }
+
+    // stop refresh user online
+    if (onlineInterval) {
+      clearInterval(onlineInterval);
+      onlineInterval = null;
+    }
+
+    // tutup chat kalau terbuka
+    const chatPanel = document.getElementById("chatPanel");
+    if (chatPanel) {
+      chatPanel.classList.add("hidden");
+    }
+
+    setTimeout(() => {
+      // tampilkan login
+      document.getElementById("loginPage").style.display = "flex";
+
+      // sembunyikan dashboard
+      document.querySelector("header").style.display = "none";
+      document.querySelector("main").style.display = "none";
+
+      // sembunyikan report
+      document.getElementById("reportSection").style.display = "none";
+      document.getElementById("photoReportSection").style.display = "none";
+
+      // reset form login
+      document.getElementById("loginEmail").value = "";
+      document.getElementById("loginPassword").value = "";
+
+      // hapus session
+      localStorage.removeItem("currentUser");
+      localStorage.removeItem("currentJobPrefix");
+
+      // reset job number
+      const jobNumber = document.getElementById("jobNumber");
+      if (jobNumber) jobNumber.textContent = "";
+
+      hideLoader();
+    }, 700);
+  } catch (err) {
+    console.error("Logout gagal:", err);
+    hideLoader();
+  }
+}
+// ===================== TOGGLE PASSWORD =====================
+const togglePassword = document.getElementById("togglePassword");
+const passwordInput = document.getElementById("loginPassword");
+
+togglePassword.addEventListener("click", () => {
+  const isVisible = passwordInput.type === "text";
+  passwordInput.type = isVisible ? "password" : "text";
+
+  // Ubah isi SVG di dalam span, bukan outerHTML
+  togglePassword.innerHTML = isVisible
+    ? `<svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>`
+    : `<svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.26 18.26 0 0 1 4.47-5.94M1 1l22 22"/>
+          <path d="M9.88 9.88A3 3 0 0 0 12 15a3 3 0 0 0 2.12-.88"/>
+        </svg>`;
+});
+
+// ===================== Tampilkan tanggal otomatis =====================
+document.getElementById(
+  "current-date"
+).textContent = new Date().toLocaleDateString("id-ID", {
+  weekday: "long",
+  year: "numeric",
+  month: "long",
+  day: "numeric"
+});
+
+// ===================== ATURAN TAMPILAN AWAL =====================
+window.addEventListener("DOMContentLoaded", async () => {
+  document.querySelector("header").style.display = "none";
+  document.querySelector("main").style.display = "none";
+  document.getElementById("loginPage").style.display = "flex";
+
+  // ambil user dari sheet
+  await loadUsers();
+
+  // cek session login
+  const savedUser = localStorage.getItem("currentUser");
+  const savedPrefix = localStorage.getItem("currentJobPrefix");
+
+  if (!savedUser) return;
+
+  // cari user di database sheet
+  const user = users.find((u) => String(u.Email).trim() === savedUser);
+
+  if (!user) {
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("currentJobPrefix");
+    return;
+  }
+
+  // tampilkan dashboard
+  document.getElementById("loginPage").style.display = "none";
+  document.querySelector("header").style.display = "flex";
+  document.querySelector("main").style.display = "block";
+
+  // foto user
+  const userInfoImg = document.querySelector(".user-info img");
+  userInfoImg.src =
+    user.Foto || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+  // nama user
+  const userInfoText = document.querySelector(".user-info span");
+  userInfoText.textContent = user.Nama || savedUser.split("@")[0];
+
+  // update status online lagi
+  await updateUserStatus(savedUser, "Online", "Auto Login");
+
+  // tampilkan dashboard
+  showDashboardMaintenance();
+
+  // load user online
+  loadOnlineUsers();
+  setInterval(loadOnlineUsers, 5000);
+
+  console.log("Prefix Auto Login:", savedPrefix);
+});
+
+// ===================== PANEL MENU =====================
+function togglePanel() {
+  document.getElementById("slidePanel").classList.toggle("open");
+}
+
+// ===================== LOADER CONTROL =====================
+function showLoader() {
+  document.getElementById("loaderOverlay").classList.add("active");
+}
+
+function hideLoader() {
+  document.getElementById("loaderOverlay").classList.remove("active");
+}
+
+// ===================== PEMBUNGKUS LOADER =====================
+function showLoaderAndRun(callback) {
+  showLoader();
+  setTimeout(() => {
+    try {
+      callback();
+    } finally {
+      hideLoader();
+    }
+  }, 800);
+}
+
+// ===================== CONTOH FUNGSI =====================
+function showForm() {
+  console.log("Menampilkan Form Pekerjaan...");
+  alert("Form Pekerjaan terbuka!");
+}
+
+function showReport() {
+  console.log("Menampilkan Laporan Pekerjaan...");
+  alert("Laporan Pekerjaan terbuka!");
+}
+
+function showPhotoReport() {
+  console.log("Menampilkan Laporan Foto...");
+  alert("Laporan Foto per Nomor Pekerjaan terbuka!");
+}
+
+document.addEventListener("keydown", function (e) {
+  if (e.key !== "Enter") return;
+
+  const el = document.activeElement;
+
+  // Fokus pada checkbox → ENTER = centang / uncentang item itu saja
+  if (el.type === "checkbox") {
+    e.preventDefault();
+    el.checked = !el.checked;
+    return;
+  }
+
+  // Fokus pada radio → ENTER = memilih radio yang sedang fokus
+  if (el.type === "radio") {
+    e.preventDefault();
+    el.checked = true; // hanya pilih item yang fokus, tidak berpindah
+    return;
+  }
+});
+
+function generateJobNumber() {
+  const currentUser = localStorage.getItem("currentUser");
+  const prefix = localStorage.getItem("currentJobPrefix") || "UNKN";
+
+  if (!currentUser) {
+    alert("Silakan login terlebih dahulu!");
+    return;
+  }
+
+  const key = `lastJobNumber_${currentUser}`;
+
+  let last = localStorage.getItem(key);
+  if (!last) last = 0;
+
+  let next = parseInt(last) + 1;
+
+  // simpan nomor terakhir
+  localStorage.setItem(key, next);
+
+  const formatted = `${prefix} : ${String(next).padStart(3, "0")}`;
+
+  // Job Number
+  document.getElementById("jobNumber").textContent = formatted;
+
+  // tanggal
+  const currentDate = new Date();
+  const formattedDate = currentDate.toLocaleString("id-ID", {
+    dateStyle: "short",
+    timeStyle: "medium"
+  });
+
+  document.getElementById("current-date").textContent = formattedDate;
+}
+
 // ===================== FORM HANDLER =====================
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("jobForm");
