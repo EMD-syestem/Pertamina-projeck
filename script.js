@@ -1194,32 +1194,72 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let sending = false;
 
+  // =========================
+  // COMPRESS IMAGE
+  // =========================
+  async function compressImage(file, maxWidth = 800, quality = 0.7) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        img.src = e.target.result;
+      };
+
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+
+        let width = img.width;
+        let height = img.height;
+
+        // resize kalau terlalu besar
+        if (width > maxWidth) {
+          height *= maxWidth / width;
+          width = maxWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // convert ke base64 jpeg
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+
+      reader.readAsDataURL(file);
+    });
+  }
+
   submitBtn.addEventListener("click", async (e) => {
     e.preventDefault();
 
     // cegah double submit
     if (sending) return;
+
     sending = true;
     submitBtn.disabled = true;
 
     try {
-      const fileInput = document.querySelector("input[type='file']");
+
+      // =========================
+      // AMBIL INPUT FOTO KHUSUS
+      // =========================
+      const fileInput = document.getElementById("uploadFoto");
+
       let fotoUrl = "";
 
       // =========================
       // CONVERT FOTO -> BASE64
       // =========================
       if (fileInput && fileInput.files.length > 0) {
+
         const file = fileInput.files[0];
 
-        fotoUrl = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
+        // compress otomatis
+        fotoUrl = await compressImage(file);
 
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = reject;
-
-          reader.readAsDataURL(file);
-        });
       }
 
       // =========================
@@ -1234,41 +1274,104 @@ document.addEventListener("DOMContentLoaded", () => {
       // FORM DATA
       // =========================
       const formData = {
-        "Job Number": document.getElementById("jobNumber")?.textContent || "",
-        "Tanggal": tanggalSekarang,
-        "User name": document.getElementById("user")?.value || "",
-        "working type": document.getElementById("workingType")?.value || "",
-        "installation type": document.getElementById("installationType")?.value || "",
-        "Merk kendaraan": document.getElementById("merkKendaraan")?.value || "",
-        "Vehicle type": document.getElementById("vehicleType")?.value || "",
-        "Lisence plate": document.getElementById("licensePlate")?.value || "",
-        "Vehicle id": document.getElementById("vehicleId")?.value || "",
-        "Department": document.getElementById("department")?.value || "",
-        "Colour": document.getElementById("colour")?.value || "",
-        "Location": document.getElementById("location")?.value || "",
-        "GPS Serial No": document.getElementById("gpsSerial")?.value || "",
-        "GPS Unit ID": document.getElementById("gpsUnitId")?.value || "",
-        "GSM": document.getElementById("gsm")?.value || "",
-        "Distance": document.getElementById("distance")?.value || "",
-        "GPS Unit Module": getStatus("gps"),
-        "RFID Reader": getStatus("rfid"),
-        "Buzzer": getStatus("buzzer"),
-        "Stater interupter": getStatus("starter"),
-        "Fuel stick": getStatus("fuel"),
-        "Mesin": getStatus("d-mesin"),
-        "Panel Dasbord": getStatus("d-paneldashboard"),
-        "Klakson": getStatus("d-klakson"),
-        "Audio": getStatus("d-audio"),
-        "Sistem listrik": getStatus("d-listrik"),
-        "AC": getStatus("d-ac"),
-        "Power windows": getStatus("d-powerwindows"),
-        "Panel Instrument": getStatus("d-panelinstrument"),
-        "Spion": getStatus("d-spion"),
+        "Job Number":
+          document.getElementById("jobNumber")?.textContent || "",
+
+        "Tanggal":
+          tanggalSekarang,
+
+        "User name":
+          document.getElementById("user")?.value || "",
+
+        "working type":
+          document.getElementById("workingType")?.value || "",
+
+        "installation type":
+          document.getElementById("installationType")?.value || "",
+
+        "Merk kendaraan":
+          document.getElementById("merkKendaraan")?.value || "",
+
+        "Vehicle type":
+          document.getElementById("vehicleType")?.value || "",
+
+        "Lisence plate":
+          document.getElementById("licensePlate")?.value || "",
+
+        "Vehicle id":
+          document.getElementById("vehicleId")?.value || "",
+
+        "Department":
+          document.getElementById("department")?.value || "",
+
+        "Colour":
+          document.getElementById("colour")?.value || "",
+
+        "Location":
+          document.getElementById("location")?.value || "",
+
+        "GPS Serial No":
+          document.getElementById("gpsSerial")?.value || "",
+
+        "GPS Unit ID":
+          document.getElementById("gpsUnitId")?.value || "",
+
+        "GSM":
+          document.getElementById("gsm")?.value || "",
+
+        "Distance":
+          document.getElementById("distance")?.value || "",
+
+        "GPS Unit Module":
+          getStatus("gps"),
+
+        "RFID Reader":
+          getStatus("rfid"),
+
+        "Buzzer":
+          getStatus("buzzer"),
+
+        "Stater interupter":
+          getStatus("starter"),
+
+        "Fuel stick":
+          getStatus("fuel"),
+
+        "Mesin":
+          getStatus("d-mesin"),
+
+        "Panel Dasbord":
+          getStatus("d-paneldashboard"),
+
+        "Klakson":
+          getStatus("d-klakson"),
+
+        "Audio":
+          getStatus("d-audio"),
+
+        "Sistem listrik":
+          getStatus("d-listrik"),
+
+        "AC":
+          getStatus("d-ac"),
+
+        "Power windows":
+          getStatus("d-powerwindows"),
+
+        "Panel Instrument":
+          getStatus("d-panelinstrument"),
+
+        "Spion":
+          getStatus("d-spion"),
+
         "Deskripsi Pekerjaan":
           document.getElementById("deskripsiPekerjaan")?.value || "",
+
         "Progres Status":
           document.getElementById("progressStatus")?.value || "",
-        "Upload foto Bukti": fotoUrl
+
+        "Upload foto Bukti":
+          fotoUrl
       };
 
       console.log("📤 Mengirim:", formData);
@@ -1277,16 +1380,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
       console.log("✅ sukses simpan");
 
+      alert("✅ Data berhasil dikirim");
+
+      // generate job baru
       if (typeof generateJobNumber === "function") {
         generateJobNumber();
       }
 
+      // optional reset form
+      form.reset();
+
     } catch (err) {
+
       console.error("❌ Gagal simpan:", err);
+
       alert("❌ Gagal kirim data");
+
     } finally {
+
       sending = false;
       submitBtn.disabled = false;
+
     }
   });
 });
