@@ -5211,7 +5211,7 @@ function openDetail(item = {}) {
 
 <!-- HEADER -->
 <div class="modal-header">
-  <img src="https://github.com/EMD-system/Pertamina-projeck/blob/main/ind.png?raw=true" alt="Foto Ind">
+  <img src="https://raw.githubusercontent.com/EMD-syestem/Pertamina-projeck/refs/heads/main/ind.png">
   <div>
     <h1>Indosat Ooredoo & Pertamina Jambi Project</h1>
     <h2>Laporan Pekerjaan (Job Report)</h2>
